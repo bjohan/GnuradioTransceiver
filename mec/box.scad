@@ -6,9 +6,9 @@ insideZ = 40;
 t = 3;
 
 module display(){
-    translate([2.0, 6, -1]){
+    translate([2.0, 5, -1]){
         color([0.3, 0.3, 0.3])
-            cube([118, 70, 1]);
+            cube([118, 72, 1]);
         translate([57,-6,0])
             cube([13, 6, 1]);
     }
@@ -16,7 +16,7 @@ module display(){
         color([0,0,1])
             cube([121, 78, 7]);
         translate([43, 78, -15])
-            color([0,0l1])
+            color([0,0, 1])
                 cube([18, 11, 15]);
     }
 }
@@ -26,11 +26,68 @@ module displayBezel(h){
         cube([110,66,h]);
 }
 
-module pillar(x, y, z, r){
-    difference(){
-        cube([x, y, z]);
+module pillar(x, y, z, r, holeOnly){
+    if(holeOnly){
         translate([x/2, y/2,-1])
-            cylinder(z+2, r, r); 
+        cylinder(z+2, r, r); 
+    } else {
+        difference(){
+            cube([x, y, z]);
+            translate([x/2, y/2,-1])
+                cylinder(z+2, r, r); 
+        }
+    }
+}
+
+module supportPillars(holeOnly){
+    //displaySupports
+    h = 31;
+    ho=holeOnly;
+    translate([33,10]){
+        color([1,0,0]){
+            pillar(15,15,h,1.5, ho);
+        }
+    }
+    translate([33,73]){
+        color([1,0,0]){
+            pillar(15,15,h,1.5, ho);
+        }
+    }
+    translate([140,90]){
+        color([1,0,0]){
+            pillar(15,15,h,1.5, ho);
+        }
+    }
+    translate([140,3]){
+        color([1,0,0]){
+            pillar(15,6,h,1.5, ho);
+        }
+    }
+}
+
+module cornerPillars(holeOnly){
+    h2=43;
+    ho=holeOnly;
+    //Corner pillars
+    translate([t,t]){
+        color([1,0,0]){
+            pillar(15,15,h2,1.5, ho);
+        }
+    }
+    translate([t,insideY+t-15]){
+        color([1,0,0]){
+            pillar(15,15,h2,1.5, ho);
+        }
+    }
+    translate([160,90]){
+        color([1,0,0]){
+            pillar(15,15,h2,1.5, ho);
+        }
+    }
+    translate([160,3]){
+        color([1,0,0]){
+            pillar(15,6,h2,1.5, ho);
+        }
     }
 }
 
@@ -42,32 +99,7 @@ module box(){
                 cube([insideX, insideY, insideZ+0.1]);
         }
     }
-    //displaySupports
-    translate([33,10]){
-        color([1,0,0]){
-            pillar(15,15,25,1.5);
-        }
-    }
-    translate([33,73]){
-        color([1,0,0]){
-            pillar(15,15,25,1.5);
-        }
-    }
-    translate([160,90]){
-        color([1,0,0]){
-            pillar(15,15,25,1.5);
-        }
-    }
-    translate([160,90]){
-        color([1,0,0]){
-            pillar(15,15,25,1.5);
-        }
-    }
-    translate([160,3]){
-        color([1,0,0]){
-            pillar(15,6,25,1.5);
-        }
-    }
+
 }
 
 module encoderScrewHoles(r,h){
@@ -122,10 +154,10 @@ module encoderAssemblyPlaced(holes, t){
             minkowski(){
                 sphere(0.25);
                 union(){
-                    translate([0,0,-0.5])
+                    translate([0,0,37])
                     encoderShaftHole(t+1);
                     translate([0,0,37])
-                        encoderScrewHoles(3/2, t+1);
+                        encoderScrewHoles(4/2, t+1);
                 }
             }
         }
@@ -162,15 +194,15 @@ module raspi(){
 
 module raspiHoles(d){
     //usb 1
-    translate([0-d,1.5, 1]){
+    translate([0-d,1.0, 1]){
         color([0.5,0.5,0.5])
-            cube([10+d, 15, 16]);
+            cube([10+d, 16, 16]);
     }
     
     //usb 2
-    translate([0-d,19.5, 1]){
+    translate([0-d,19.0, 1]){
         color([0.5,0.5,0.5])
-            cube([10+d, 15, 16]);
+            cube([10+d, 16, 16]);
     }
     //ethernet
     translate([0-d,38, 1]){
@@ -191,10 +223,16 @@ module raspiPlaced(holes){
         }
 }
 
+module boxWithPillars(){
+    box();
+    supportPillars(false);
+    cornerPillars(false);
+}
 
 module boxWithHoles(){
     difference(){
-        box();
+        //box();
+        boxWithPillars();
         encoderAssemblyPlaced(true, 5);
         displayPlaced(true);
         raspiPlaced(true);
@@ -208,16 +246,31 @@ module boxDisplayAssembly(){
     raspiPlaced(false);
 }
 
+module lid(){
+    color([1,0.9,1]){
+        difference(){
+            cube([insideX+2*t, insideY+2*t, t*2]);
+            translate([0,0,-1])
+                cornerPillars(true);
+                //cube([insideX, insideY, insideZ+0.1]);
+        }
+    }
+}
 
+
+module lidPlaced(){
+    translate([0,0,50])
+        lid();
+}
 //display();
 
 //raspiPlaced(true);
 
-boxDisplayAssembly();
+//boxDisplayAssembly();
 //raspiPlaced();
 //encoderAssemblyPlaced(true, 40);
-//boxWithHoles();
-
+boxWithHoles();
+lidPlaced();
 
 
 //box();
