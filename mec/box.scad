@@ -5,6 +5,115 @@ insideY = 100;
 insideZ = 40;
 t = 3;
 
+speakerOffset = 22;
+speakerAngle = 20;
+
+module battery(){
+    cube([145, 55, 17]);
+}
+
+module speaker(){
+    translate([0,0,5]){
+        cylinder(3, 20, 20);
+        translate([0,0,3])
+            cylinder(10, 37/2, 32/2);
+        translate([0,0,13])
+            cylinder(7,22/2, 22/2);
+    }
+}
+
+module speakerHole(){
+    speaker();
+    translate([0,0,-5])
+    cylinder(10, 18, 18);
+    
+}
+
+
+module speakerSlot(){
+    //hull(){
+        minkowski(){
+        speakerHole();
+        cube([0.5, 100.5, 0.5]);    
+        //translate([0,100, 0])
+        //    speakerHole();
+    }
+}
+//speakerWithHole();
+
+module tube(l, ri, ro){
+    difference(){
+        cylinder(l, ro, ro);
+        translate([0,0,-0.1])
+        cylinder(l+0.2, ri, ri);
+    }
+}
+
+module speakerGrill(d){
+    translate([0,0,-d]){
+        tube(d, 3,5);
+        tube(d, 10,12);
+        tube(d, 18,20);
+        //translate([11, 0, 0])
+        //    tube(d, 6, 8);
+        translate([0, 11, 0])
+            tube(d, 6, 8);
+        //translate([-11, 0, 0])
+        //    tube(d, 6, 8);
+        translate([0, -11, 0])
+            tube(d, 6, 8);
+    }
+}
+
+module speakerGrillHoles(d){
+    //speakerGrill(d+0.2);
+    difference(){
+        translate([0,0,-d])
+            cylinder(d, 20, 20);
+            translate([0,0,0.1])
+                speakerGrill(d+0.2);
+    }
+}
+
+module speakersPlaced(){
+    translate([30, -speakerOffset, 19+2]){
+        rotate([-90+speakerAngle, 0, 0])
+            speaker();
+    }
+    translate([insideX+2*t-30, -speakerOffset, 19+2]){
+        rotate([-90+speakerAngle, 0, 0])
+            speaker();
+    }
+}
+
+module speakersGrillHolesPlaced(d){
+    translate([30, -speakerOffset, 19+2]){
+        rotate([-90+speakerAngle, 0, 0])
+            translate([0,0,1])
+            speakerGrillHoles(d);
+    }
+    translate([insideX+2*t-30, -speakerOffset, 19+2]){
+        rotate([-90+speakerAngle, 0, 0])
+            translate([0,0,1])
+            speakerGrillHoles(d);
+    }
+}
+
+module speakerSlotsPlaced(){
+    translate([30, -speakerOffset, 19+2]){
+        rotate([-90+speakerAngle, 0, 0])
+            speakerSlot();
+    }
+    translate([insideX+2*t-30, -speakerOffset, 19+2]){
+        rotate([-90+speakerAngle, 0, 0])
+            speakerSlot();
+    }
+}
+
+
+//speaker();
+//speakerGrillHoles(30);
+
 module display(){
     translate([2.0, 5, -1]){
         color([0.3, 0.3, 0.3])
@@ -91,16 +200,63 @@ module cornerPillars(holeOnly){
     }
 }
 
+module slope(x, y, z){
+    difference(){
+    cube([x, y, z]);
+    
+    
+    rotate([-atan2(y,z),0,0])
+        translate([-0.1,-2*y,0])
+            cube([x+0.2, 2*y, 2*z]);
+    }
+}
+module loudspeakerBoxPartBody(){
+    px = insideX+2*t;
+        pz = insideZ+t;
+        py = sin(speakerAngle)*pz;
+        //rotate([0,90,0])
+        difference(){
+            translate([0,-speakerOffset-8-3,pz])
+                mirror([0,0,1]){
+                    slope(px, py, pz);
+                    translate([0,py,0])
+                    cube([px, t, pz]);
+                }
+            translate([t,-speakerOffset-8-3+t,pz+0.1])
+                mirror([0,0,1])
+                    slope(px-2*t, py+0.1, pz+0.1);
+        }
+        translate([0,-speakerOffset+3.7,0]){
+            difference(){
+                cube([px, speakerOffset, pz]);
+                translate([t,-00.1,t]){
+                    cube([px-2*t, speakerOffset+0.2, pz]);
+                }
+        }
+    }
+        //rotate([0,90,0])
+        //    prism(px, py, pz);
+}
+
+module loudspeakerBoxPart(){
+    difference(){
+        loudspeakerBoxPartBody();
+        speakersGrillHolesPlaced(5);
+    }
+}
+
 module box(){
     color([0.9,0.9,0.9]){
         difference(){
             cube([insideX+2*t, insideY+2*t, insideZ+t]);
-            translate([t,t,t])
-                cube([insideX, insideY, insideZ+0.1]);
+            translate([t,0*t-0.1,t])
+                cube([insideX, t+insideY+0.1, insideZ+0.1]);
         }
+        loudspeakerBoxPart();        
     }
-
 }
+
+
 
 module encoderScrewHoles(r,h){
     for(i=[0:2]){
@@ -167,27 +323,56 @@ module encoderAssemblyPlaced(holes, t){
 
 module raspi(){
     //Base board
-    
     translate([0,0,0]){
-        color([0,1,0])
-            cube([85, 56, 1]);
+        color([0,1,0]){
+            difference(){
+                cube([85, 56, 1]);
+                    r=2.65/2;
+                    translate([22.2+r,2.2+r,-1])
+                        cylinder(5,r,r);
+                    translate([22.2+r,51+r,-1])
+                        cylinder(5,r,r);
+                    translate([80+r,2.2+r,-1])
+                        cylinder(5,r,r);
+                    translate([80+r,51+r,-1])
+                        cylinder(5,r,r);
+            }
+        }
     }
     
     //usb 1
     translate([0,1.5, 1]){
         color([0.5,0.5,0.5])
-            cube([10, 15, 16]);
+            cube([17, 15, 16]);
     }
     
     //usb 2
     translate([0,19.5, 1]){
         color([0.5,0.5,0.5])
-            cube([10, 15, 16]);
+            cube([17, 15, 16]);
     }
     //ethernet
     translate([0,38, 1]){
         color([0.5,0.5,0.5])
-            cube([10, 16, 14]);
+            cube([21, 16, 14]);
+    }
+    
+    //micro usb
+    translate([70, 50, 1]){
+        color([0.5,0.5,0.5])
+            cube([9, 8, 3]);
+    }
+    
+    //headphone
+    translate([28, 50, 1]){
+        color([0,0,0])
+            cube([7, 8, 7]);
+    }
+    
+    //microsd
+    translate([72, 21, -2]){
+        color([0.5,0.5,0.5])
+            cube([18, 14, 2]);
     }
 }
 
@@ -195,8 +380,10 @@ module raspi(){
 module raspiHoles(d){
     //usb 1
     translate([0-d,1.0, 1]){
-        color([0.5,0.5,0.5])
+        color([0.5,0.5,0.5]){
             cube([10+d, 16, 16]);
+            
+        }
     }
     
     //usb 2
@@ -209,6 +396,32 @@ module raspiHoles(d){
         color([0.5,0.5,0.5])
             cube([10+d, 16, 14]);
     }
+    //micro usb
+    translate([70-5, 50, 1-4]){
+        color([0.5,0.5,0.5])
+            cube([9+10, 8+d, 3+8]);
+    }
+    
+    //headphone
+    translate([28-2, 50, 1-4]){
+        color([0,0,0])
+            cube([7+4, 8+13, 7+8]);
+    }
+    
+    //microsd
+    translate([72, 21, -2]){
+        color([0.5,0.5,0.5])
+            cube([18+10, 14, 2]);
+    }
+    r=2.65/2;
+    translate([22.2+r,2.2+r,-1-d])
+        cylinder(5+d,r,r);
+    translate([22.2+r,51+r,-1-d])
+        cylinder(5+d,r,r);
+    translate([80+r,2.2+r,-1-d])
+        cylinder(5+d,r,r);
+    translate([80+r,51+r,-1-d])
+        cylinder(5+d,r,r);
 }
 
 
@@ -247,31 +460,94 @@ module boxDisplayAssembly(){
 }
 
 module lid(){
+    e = 33;
     color([1,0.9,1]){
         difference(){
-            cube([insideX+2*t, insideY+2*t, t*2]);
+            translate([0, -e, 0]){
+                difference(){
+                    cube([insideX+2*t, insideY+2*t+e, 20 + 0*t*2]);
+                    translate([15, 15, -9])
+                    cube([insideX+2*t-30, insideY+2*t+e-30, 26]);
+                }
+            }
             translate([0,0,-1])
                 cornerPillars(true);
                 //cube([insideX, insideY, insideZ+0.1]);
         }
     }
+    translate([15,0,0])
+    battery();
 }
 
 
 module lidPlaced(){
-    translate([0,0,50])
+    translate([0,0,43])
         lid();
 }
+
+module electronicsConsoleBody(){
+    difference(){
+        translate([19-18, 3.5-25, 31]){
+            cube([153+18, 99+25, 3]);
+            difference(){
+                union(){
+                    translate([10-2.5, 10, -25])
+                        rotate([speakerAngle, 0, 0])
+                            cube([45, 22, 30]);
+                    
+                    translate([10-2.5+insideX+2*t-60, 10, -25])
+                        rotate([speakerAngle, 0, 0])
+                            cube([45, 22, 30]);
+                }
+                
+                translate([0,-1,3])
+                    cube([200, 200, 15]);
+            }
+        }
+        translate([25, 53, 36+t])
+            rotate([0,180,0])
+                minkowski(){
+                    encoderBody();
+                    translate([-1, -1, -1])
+                        cube([2,2,2]);
+                }
+         minkowski(){
+            cornerPillars();
+            translate([-1, -1, -1])
+                cube([2,2,2]);
+         }
+         translate([0,0,5])
+            supportPillars(true);
+    }
+    
+}
+
+module electronicsConsole(){
+    difference(){
+        electronicsConsoleBody();
+        raspiPlaced(true);
+        speakerSlotsPlaced();
+    }
+}
+
+//raspi();
+//raspiHoles(50);
+electronicsConsole();
+//raspiPlaced(true);
 //display();
 
 //raspiPlaced(true);
 
-//boxDisplayAssembly();
+boxDisplayAssembly();
+speakersPlaced();
+//translate([-50, -50, 43])
+//cube([100, 100, 1]);
+
 //raspiPlaced();
 //encoderAssemblyPlaced(true, 40);
-boxWithHoles();
+//boxWithHoles();
 lidPlaced();
-
+//lid();
 
 //box();
 
