@@ -1,5 +1,6 @@
 include <Knob.scad>
-
+use <ElectronicModuleAssembly/modules/lm2596-dc-dc.scad>
+use <ElectronicModuleAssembly/modules/dsn-dvm-368.scad>
 insideX = 170;
 insideY = 100;
 insideZ = 40;
@@ -7,6 +8,23 @@ t = 3;
 
 speakerOffset = 22;
 speakerAngle = 20;
+
+module dvmPlaced(){
+    translate([15,-18,20])
+        rotate([90+speakerAngle, 0, 0]){
+            translate([72, -5, 0])
+                dsnDvm368Module();
+        }
+}
+
+module switchHolePlaced(){
+    translate([0,-18,27])
+        rotate([90+speakerAngle, 0, 0]){
+            translate([72, -5, 0])
+                cylinder(30, 5/2, 5/2);
+                //dsnDvm368Module();
+        }
+}
 
 module battery(){
     cube([145, 55, 17]);
@@ -449,6 +467,8 @@ module boxWithHoles(){
         encoderAssemblyPlaced(true, 5);
         displayPlaced(true);
         raspiPlaced(true);
+        dvmPlaced();
+        switchHolePlaced();
     }
 }
 
@@ -487,15 +507,15 @@ module lidPlaced(){
 
 module electronicsConsoleBody(){
     difference(){
-        translate([19-18, 3.5-25, 31]){
-            cube([153+18, 99+25, 3]);
+        translate([19-16, 3.5-25, 31]){
+            cube([153+16, 99+25, 3]);
             difference(){
                 union(){
-                    translate([10-2.5, 10, -25])
+                    translate([10-5, 8, -25])
                         rotate([speakerAngle, 0, 0])
                             cube([45, 22, 30]);
                     
-                    translate([10-2.5+insideX+2*t-60, 10, -25])
+                    translate([10-5+insideX+2*t-60, 8, -25])
                         rotate([speakerAngle, 0, 0])
                             cube([45, 22, 30]);
                 }
@@ -533,8 +553,8 @@ module electronicsConsole(){
 //raspi();
 //raspiHoles(50);
 electronicsConsole();
-//raspiPlaced(true);
-//display();
+raspiPlaced(false);
+displayPlaced();
 
 //raspiPlaced(true);
 
@@ -550,6 +570,12 @@ lidPlaced();
 //lid();
 
 //box();
-
+//dvmPlaced();
+//switchHolePlaced();
+/*translate([0,-15,20])
+rotate([90+speakerAngle, 0, 0]){
+    translate([72, -5, 0])
+    dsnDvm368Module();
+}*/
 //display();
 //displayBezel(4);
