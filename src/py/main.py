@@ -9,6 +9,7 @@ from kivy.uix.tabbedpanel import TabbedPanelHeader
 from kivy.clock import Clock
 from kivy.config import Config
 from kivy.core.window import Window
+from mapwidget import MapWidget
 import encoder
 
 
@@ -39,6 +40,10 @@ class VfoScreen(GridLayout):
 	self.tabs.add_widget(self.fftTab)
 	self.fftTab.content = Label(text="FFT");
 
+	self.mapTab = TabbedPanelHeader(text="Map")
+	self.tabs.add_widget(self.mapTab)
+	self.mapTab.content = MapWidget()
+
 
         self.add_widget(self.vfoLabel)
 	self.add_widget(self.tabs)
@@ -56,9 +61,9 @@ class MyApp(App):
     def build(self):
         #Config.set('graphics', 'width', '800')
         #Config.set('graphics', 'height', '480')
-	Window.size=(800, 480)
-	Window.fullscreen = True
-        #Config.set('graphics', 'fullscreen', '1')
+	#Window.size=(800, 480)
+	#Window.fullscreen = True
+        Config.set('graphics', 'fullscreen', 'auto')
         self.screen = VfoScreen()#Button(text='Hello World')
         #Clock.schedule_interval(self.update, 1)
         return self.screen
