@@ -7,14 +7,20 @@ class EncoderThread(threading.Thread):
 	def __init__(self, port, callback = None):
 		threading.Thread.__init__(self)
 		self.q = Queue.Queue()
-		self.s = serial.Serial(port, 9600)
+		try:
+			self.s = serial.Serial(port, 9600)
+		except:
+			self.s = None
 		self.start()
 		self.callback = callback
 		self.last = None
 
 	def run(self):
 		while True:
-			val = int(self.s.readline())
+			if self.s:
+				val = int(self.s.readline())
+			else:
+				val = 0
 			if self.last is None:
 				self.last = val
 			
