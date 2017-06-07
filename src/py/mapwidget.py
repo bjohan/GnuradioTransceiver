@@ -3,6 +3,8 @@ from kivy.uix.widget import Widget
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
+from kivy.uix.switch import Switch
+from kivy.uix.label import Label
 from kivy.graphics import Color, Ellipse, UpdateNormalMatrix, Mesh
 from kivy.graphics.opengl import *
 from kivy.graphics.instructions import RenderContext, Callback
@@ -17,11 +19,13 @@ import numpy as np
 
 
 class Renderer(Widget):
-    def __init__(self, **kwargs):
+    def __init__(self, zs, ps, **kwargs):
         super(Renderer, self).__init__(**kwargs)
         self.canvas = RenderContext(compute_normal_mat=True)
         self.canvas.shader.source = resource_find('simple.glsl')
-        self._keyboard = Window.request_keyboard(self._keyboard_closed, self)        
+        self._keyboard = Window.request_keyboard(self._keyboard_closed, self)   
+        self.zs = zs
+        self.ps = ps
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
         self._keyboard.bind(on_key_up=self._on_keyboard_up)
         self.shiftDown = False
@@ -61,13 +65,22 @@ class Renderer(Widget):
             self.shiftDown = False
 
     def on_touch_move(self,  t):
-        if self.shiftDown:
-            self.translate.x += (t.dx/10.0)#/self.scale.x
-            self.translate.z -= (t.dy/10.0)#/self.scale.y
-               
-        else:
-            self.rot.angle += t.dx
-            self.rotx.angle -= t.dy
+        if self.collide_point(t.pos[0], t.pos[1]):
+            if self.shiftDown or self.ps.active:
+                self.translate.x += (t.dx/10.0)#/self.scale.x
+                self.translate.z -= (t.dy/10.0)#/self.scale.y
+            elif self.zs.active:
+                if t.dy > 0:
+                    self.scale.x *= 1.1
+                    self.scale.y *= 1.1
+                    self.scale.z *= 1.1
+                else:
+                    self.scale.x *= 0.9
+                    self.scale.y *= 0.9
+                    self.scale.z *= 0.9
+            else:
+                self.rot.angle += t.dx
+                self.rotx.angle -= t.dy
 
     def on_touch_down(self, t):
         if t.button == 'scrollup':
@@ -80,10 +93,10 @@ class Renderer(Widget):
             self.scale.z *= 0.9
 
     def generateHeightData(self, sx, sy, za):
-	
+    
         L = 1201
         with open('O33/N57E012.hgt') as hgt:
-	        elevations = np.fromfile(hgt, np.dtype('>i2', L*L)).reshape((L,L))
+            elevations = np.fromfile(hgt, np.dtype('>i2', L*L)).reshape((L,L))
 
         return elevations[500:500+sx, 500:500+sy]/100.0
         #return np.random.rand(sx, sy)*za
@@ -187,7 +200,30 @@ class MapWidget(GridLayout):
         self.cols = 1
         GridLayout.__init__(self, **kwargs)
         topLayout=BoxLayout(orientation = "vertical")
+        midLayout = BoxLayout(orientation = "horizontal", size_hint=(1.0,0.8))
+        swLayout = BoxLayout(orientation = "vertical", size_hint=(0.2, 1.0))
+        swLayout.add_widget(Label(text="Zoom"))
+        self.zs = Switch()
+        self.zs.bind(active=self.zoomSwitchLogic)
+        swLayout.add_widget(self.zs)
+        swLayout.add_widget(Label(text="Pan"))
+        self.ps = Switch()
+        self.ps.bind(active=self.panSwitchLogic)
+        swLayout.add_widget(self.ps)
+        midLayout.add_widget(Renderer(self.zs, self.ps, size_hint=(0.8, 1.0)))
+        midLayout.add_widget(swLayout)
+       
         topLayout.add_widget(Button(text="first", size_hint=(1.0, 0.1)))
-        topLayout.add_widget(Renderer(size_hint=(1.0, 0.8)))
+        #topLayout.add_widget(Renderer(size_hint=(1.0, 0.8)))
+        topLayout.add_widget(midLayout)
         topLayout.add_widget(Button(text="second", size_hint=(1.0,0.1)))
         self.add_widget(topLayout)
+
+    def zoomSwitchLogic(self, a, b):
+        if self.zs.active and self.ps.active:
+            self.ps.active = False
+
+    def panSwitchLogic(self, a, b):
+        if self.zs.active and self.ps.active:
+            self.zs.active = False
+
