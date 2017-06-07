@@ -1,3 +1,4 @@
+from kivy.core.window import Window
 from kivy.uix.widget import Widget
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
@@ -5,7 +6,7 @@ from kivy.uix.button import Button
 from kivy.graphics import Color, Ellipse, UpdateNormalMatrix, Mesh
 from kivy.graphics.opengl import *
 from kivy.graphics.instructions import RenderContext, Callback
-from kivy.graphics.context_instructions import PushMatrix, PopMatrix, Translate, Rotate
+from kivy.graphics.context_instructions import PushMatrix, PopMatrix, Translate, Rotate, Scale
 from kivy.clock import Clock
 from kivy.graphics.transformation import Matrix
 #from objloader import ObjFile
@@ -17,10 +18,14 @@ import numpy as np
 
 class Renderer(Widget):
     def __init__(self, **kwargs):
+        super(Renderer, self).__init__(**kwargs)
         self.canvas = RenderContext(compute_normal_mat=True)
         self.canvas.shader.source = resource_find('simple.glsl')
+        self._keyboard = Window.request_keyboard(self._keyboard_closed, self)        
+        self._keyboard.bind(on_key_down=self._on_keyboard_down)
+        self._keyboard.bind(on_key_up=self._on_keyboard_up)
+        self.shiftDown = False
         #self.scene = ObjFile(resource_find("monkey.obj"))
-        super(Renderer, self).__init__(**kwargs)
         with self.canvas:
             self.cb = Callback(self.setup_gl_context)
             PushMatrix()
@@ -38,18 +43,50 @@ class Renderer(Widget):
     def update_glsl(self, *largs):
         asp = self.width / float(self.height)
         proj = Matrix().view_clip(-asp, asp, -1, 1, 1, 100, 1)
+        #proj = Matrix().perspective(90, asp, 0, 100)
         self.canvas['projection_mat'] = proj
         self.canvas['diffuse_light'] = (0.0, 1.0, 0.8)
         self.canvas['ambient_light'] = (0.1, 0.6, 0.1)
         #self.rot.angle += 1
 
+    def _keyboard_closed(self, k):
+        print k
+
+    def _on_keyboard_down(self, k, l, m, n):
+        if 'shift' in l[1]:
+            self.shiftDown = True
+
+    def _on_keyboard_up(self, k, l):
+        if 'shift' in l[1]:
+            self.shiftDown = False
+
     def on_touch_move(self,  t):
-        self.rot.angle += t.dx
-        self.rotx.angle -= t.dy
-        #print t.dx
+        if self.shiftDown:
+            self.translate.x += (t.dx/10.0)#/self.scale.x
+            self.translate.z -= (t.dy/10.0)#/self.scale.y
+               
+        else:
+            self.rot.angle += t.dx
+            self.rotx.angle -= t.dy
+
+    def on_touch_down(self, t):
+        if t.button == 'scrollup':
+            self.scale.x *= 1.1
+            self.scale.y *= 1.1
+            self.scale.z *= 1.1
+        if t.button == 'scrolldown':
+            self.scale.x *= 0.9
+            self.scale.y *= 0.9
+            self.scale.z *= 0.9
 
     def generateHeightData(self, sx, sy, za):
-        return np.random.rand(sx, sy)*za
+	
+        L = 1201
+        with open('O33/N57E012.hgt') as hgt:
+	        elevations = np.fromfile(hgt, np.dtype('>i2', L*L)).reshape((L,L))
+
+        return elevations[500:500+sx, 500:500+sy]/100.0
+        #return np.random.rand(sx, sy)*za
 
     def calcNormals(self, hgt):
         normals = np.ones((hgt.shape[0], hgt.shape[1], 3))
@@ -112,9 +149,10 @@ class Renderer(Widget):
     def setup_scene(self):
         Color(1, 0, 1, 1)
         PushMatrix()
-        Translate(0, -3, -10)
-        self.rotx = Rotate(0, 1, 0, 0);
+        self.translate = Translate(0, -3, -10)
+        self.rotx = Rotate(0, 1, 0, 0)
         self.rot = Rotate(0.5, 0, 1, 0)
+        self.scale = Scale(1.0)
         #m = random.sample(xrange(10), 10)#list(self.scene.objects.values())[0]
         #m = list(self.scene.objects.values())[0]
         self.mesh = self.generateMesh()#Mesh(
