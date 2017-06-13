@@ -121,7 +121,7 @@ class Renderer(Widget):
                 vyp1 = np.array([x, y+1, yp1])
                 v = np.array([x, y, p])
                 normal = np.cross(vxp1-v, vyp1-v)
-                normal = normal/abs(normal)
+                #normal = normal/abs(normal)
                 normals[x, y, :] = normal
         return normals; 
 
