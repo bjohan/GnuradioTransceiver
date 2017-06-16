@@ -2,10 +2,114 @@ import SoapySDR
 from SoapySDR import * #SOAPY_SDR_ constants
 import numpy #use numpy for buffers
 
+
+class BaseBandDevice:
+	#Class that will service each baseband device
+	def __init__(self, bbdev):
+		self.bbdev = bbdev
+		self.sdr = SoapySDR.Device(bbdev)
+	
+	def listAntennas(self):
+		return {'rx': self.sdr.listAntennas(SOAPY_SDR_RX, 0),
+			'tx': self.sdr.listAntennas(SOAPY_SDR_TX, 0)}
+	
+
+	def listGains(self):
+		return {'rx': self.sdr.listGains(SOAPY_SDR_RX, 0),
+			'tx': self.sdr.listGains(SOAPY_SDR_TX, 0)}
+		
+	def listFreqs(self):
+		rxfs = []
+		txfs = []
+		rl = self.sdr.getFrequencyRange(SOAPY_SDR_RX, 0)
+		for r in rl:
+			#print "R is", dir(r)
+			#print "minimum", r.minimum()
+			rxfs.append((r.minimum(), r.maximum(), r.step()))
+		tl = self.sdr.getFrequencyRange(SOAPY_SDR_TX, 0)
+		for t in tl:
+			txfs.append((t.minimum(), t.maximum(), t.step()))
+		return {'rx': rxfs,
+			'tx': txfs}
+
+	def listBandwidths(self):
+		return {'rx': self.sdr.listBandwidths(SOAPY_SDR_RX, 0),
+			'tx': self.sdr.listBandwidths(SOAPY_SDR_TX, 0)}
+
+	def listSampleRates(self):
+		return {'rx': self.sdr.listSampleRates(SOAPY_SDR_RX, 0),
+			'tx': self.sdr.listSampleRates(SOAPY_SDR_TX, 0)}
+
+	def listClockSources(self):
+		return self.sdr.listClockSources()
+	
+	def getDeviceDescription(self):
+		return {
+			'antennas':self.listAntennas(),
+			'gains': self.listGains(),
+			'frequencies': self.listFreqs(),
+			'bandwidths': self.listBandwidths(),
+			'sample_rates': self.listSampleRates(),
+			'clock_sources': self.listClockSources()}
+	
+	def rtxDictToString(self, rxtext, txtext, d):
+		ret = ""
+		if 'rx' in d:
+			ret+=rxtext
+			for p in d['rx']:
+				ret += str(p)+' '
+		ret+='\n'
+		if 'tx' in d:
+			ret+=txtext
+			for p in d['tx']:
+				ret += str(p)+' '
+
+		return ret+'\n'
+
+	def tupleToString(self, name, tup):
+		ret = ''
+		if len(tup):
+			ret+=name
+			for t in tup:
+				ret+=t+' '
+			ret+='\n'
+		return ret
+	
+	def __str__(self):
+		ret = "SDR device info\n"
+		ret+= "="*len(ret)+'\n'
+		for p in self.bbdev.items():
+			ret+="%s: %s\n"%p
+		ret+=self.rtxDictToString("RX antennas: ", "TX antennas: ", self.listAntennas())
+		ret+=self.rtxDictToString("RX gains: ", "TX gains: ", self.listGains())
+		ret+=self.rtxDictToString("RX freqs: ", "TX freqs: ", self.listFreqs())
+		ret+=self.rtxDictToString("RX bw: ", "TX bw: ", self.listBandwidths())
+		ret+=self.rtxDictToString("RX rates: ", "TX rates: ", self.listSampleRates())
+		ret+=self.tupleToString("Clocks: ", self.listClockSources())
+
+		ret+='\n'
+		return ret
+
 #enumerate devices
 results = SoapySDR.Device.enumerate()
 print "Got", len(results), "devices"
-for result in results: print(result)
+devs = []
+for result in results: 
+	devs.append(BaseBandDevice(result))
+for dev in devs:
+	print dev.getDeviceDescription()
+	print dev
+	#print dir(dev.getDeviceDescription()['frequencies']['rx'][0])
+	#print dev.getDeviceDescription()['frequencies']['rx'][0]
+	#print dev.getDeviceDescription()['frequencies']['rx'].index
+	#for a in dir(dev.sdr):
+	#	if 'list' in a or 'get' in a:
+	#		print a
+	#print dev.bbdev.values()
+	#print dev.bbdev.items()
+
+exit(0)
+	#print(result)
 
 #create device instance
 #args can be user defined or from the enumeration result
