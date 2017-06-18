@@ -3,7 +3,7 @@ from SoapySDR import * #SOAPY_SDR_ constants
 import numpy #use numpy for buffers
 
 
-class BaseBandDevice:
+class SdrDevice:
 	#Class that will service each baseband device
 	def __init__(self, bbdev):
 		self.bbdev = bbdev
@@ -95,7 +95,7 @@ results = SoapySDR.Device.enumerate()
 print "Got", len(results), "devices"
 devs = []
 for result in results: 
-	devs.append(BaseBandDevice(result))
+	devs.append(SdrDevice(result))
 for dev in devs:
 	print dev.getDeviceDescription()
 	print dev
