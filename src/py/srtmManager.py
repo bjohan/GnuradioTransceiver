@@ -163,10 +163,10 @@ class srtmManager:
             e = 0;
         return e
 
-num = 2000
+num = 200
 s = srtmManager()
-lats = np.linspace(-90,90,num)
-lons = np.linspace(-180, 180, num)
+lats = np.linspace(50,60,num)
+lons = np.linspace(10, 9, num)
 elevs = np.ones((num,num))
 for x in range(num):
 

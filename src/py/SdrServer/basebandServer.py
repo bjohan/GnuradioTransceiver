@@ -91,14 +91,14 @@ class SdrDevice:
 		return ret
 
 #enumerate devices
-results = SoapySDR.Device.enumerate()
-print "Got", len(results), "devices"
-devs = []
-for result in results: 
-	devs.append(SdrDevice(result))
-for dev in devs:
-	print dev.getDeviceDescription()
-	print dev
+#results = SoapySDR.Device.enumerate()
+#print "Got", len(results), "devices"
+#devs = []
+#for result in results: 
+#	devs.append(SdrDevice(result))
+#for dev in devs:
+#	print dev.getDeviceDescription()
+#	print dev
 	#print dir(dev.getDeviceDescription()['frequencies']['rx'][0])
 	#print dev.getDeviceDescription()['frequencies']['rx'][0]
 	#print dev.getDeviceDescription()['frequencies']['rx'].index
@@ -108,7 +108,7 @@ for dev in devs:
 	#print dev.bbdev.values()
 	#print dev.bbdev.items()
 
-exit(0)
+#exit(0)
 	#print(result)
 
 #create device instance

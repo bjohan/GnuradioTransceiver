@@ -1,4 +1,5 @@
 from kivy.core.window import Window
+from kivy.input.providers.mouse import MouseMotionEvent
 from kivy.uix.widget import Widget
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
@@ -83,14 +84,15 @@ class Renderer(Widget):
                 self.rotx.angle -= t.dy
 
     def on_touch_down(self, t):
-        if t.button == 'scrollup':
-            self.scale.x *= 1.1
-            self.scale.y *= 1.1
-            self.scale.z *= 1.1
-        if t.button == 'scrolldown':
-            self.scale.x *= 0.9
-            self.scale.y *= 0.9
-            self.scale.z *= 0.9
+        if type(t) == MouseMotionEvent:
+            if t.button == 'scrollup':
+                self.scale.x *= 1.1
+                self.scale.y *= 1.1
+                self.scale.z *= 1.1
+            if t.button == 'scrolldown':
+                self.scale.x *= 0.9
+                self.scale.y *= 0.9
+                self.scale.z *= 0.9
 
     def generateHeightData(self, sx, sy, za):
     
