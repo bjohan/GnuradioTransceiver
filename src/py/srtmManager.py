@@ -121,6 +121,47 @@ class srtmManager:
                 #print link.getText()
         return files, nodes
 
+    def getBlock(self, lat, lon):
+        """ get a datablock containing lat and lon"""
+
+       
+        L = 1201
+        #Get name of the zip file containing data from cache.  
+        if (int(lat), int(lon)) not in self.srtms:
+            elevations = np.zeros((1201, 1201))
+        else:
+            url = self.srtms[(int(lat), int(lon))]
+            cachename = self.cache.getUrl(url)
+            zipname = os.path.basename(cachename)[:-4]
+
+            #Open the zip file
+            try:
+                with zipfile.ZipFile(cachename) as f:
+                    zipname = f.namelist()[0]
+                    if f.namelist()[0]:
+                        print "Loading", zipname
+                        try:
+                            with f.open(zipname) as hgt:
+                                elevations = np.fromstring(hgt.read(), np.dtype('>i2', L*L)).reshape((L,L))
+                        except Exception, e:
+                            print "Error while parsing hgt from zip", hgt, zipname, e
+                            elevations = np.zeros((1201, 1201))
+                    else:
+                        print zipname, "not in", f.namelist()
+                        elevations = np.zeros((1201, 1201))
+            except Exception, e:
+                print "Error opening zip-file", cachename, e
+        
+        #Generate axis data for latitudes and longitudes
+        #lonsign = np.sign(lon)
+        #latsign = np.sign(lat)
+        
+        lonRange = np.linspace(lon, lon+1, L)
+        latRange = np.linspace(lat, lat+1, L)
+        
+        return elevations, lonRange, latRange
+
+
     def getElevation(self, lat, lon):
         if (int(lat), int(lon)) not in self.srtms:
             return 0 #Sea level
@@ -143,10 +184,11 @@ class srtmManager:
                             #print "Wiiiee", elevations.shape
                             idxlon = int(math.floor((lon-int(lon))*1200))
                             if(idxlon < 0 ):
-                                idxlon = -idxlon
+                                idxlon = 1200+idxlon
                             idxlat = int(math.floor((lat-int(lat))*1200))
                             if(idxlat < 0 ):
-                                idxlat = -idxlat
+                                idxlat = 1200+idxlat
+                            idxlon=1200-idxlon
                             idxlat=1200-idxlat
                             #print "longitude index", idxlon, "lat", idxlat
                             #print "elevation", elevations[idxlon, idxlat]
@@ -163,22 +205,76 @@ class srtmManager:
             e = 0;
         return e
 
+class ElevationDataManager:
+    def __init__(self, dataSource):
+        self.ds = dataSource
+
+
+    def resampleNearest(self, toResample, values):
+        idx = []
+        for v in toResample:
+            #print "resampling", v, "boundary is", values[0], values[-1]
+            if v>=values[0] and v <= values[-1]:
+                #print "resampling", v
+                i =  np.abs(values -v).argmin()
+                idx.append(i)
+        return idx
+                
+    def getData(self, lats, lons):
+        data = np.zeros((lats.shape[0], lons.shape[0]))
+        cLat = lats[0]
+        cLon = lons[0]
+        lati = len(lats);
+        while cLat < lats[-1]:
+            loni = 0;
+            while cLon < lons[-1]:
+                #print "Getting", cLon, cLat
+                elevs, lona, lata = self.ds.getBlock(cLat, cLon)
+                rlat = self.resampleNearest(lats, lata)
+                rlon = self.resampleNearest(lons, lona)
+                print "Lat, lon", lati, loni, "size", len(rlat), len(rlon)
+                try:
+                    data[np.meshgrid(range(lati, lati+len(rlat)), range(loni, loni+len(rlon)))]= elevs[np.meshgrid(rlat, rlon)]
+                except:
+                    print "BEEEP"
+                #print elevs[np.meshgrid(rlon, rlon)]
+                #print data[0:len(rlon), 0:len(rlat)].shape#, elevs[rlon, rlat].shape
+                cLon = lona[rlon[-1]]
+                loni += len(rlon)
+                print lati, loni
+                #print "rlat", rlat, "rlon", rlon
+            lati-=len(rlat)
+            cLon = lons[0]
+            cLat = lata[rlat[-1]]
+        print "Done getting data"
+        return data;
+ 
+
+
+
 num = 200
 s = srtmManager()
-lats = np.linspace(50,60,num)
-lons = np.linspace(10, 9, num)
-elevs = np.ones((num,num))
-for x in range(num):
 
-    print "X", x
-    for y in range(num):
-        #print elevs.shape, lats.shape
-        elevs[x,y]=s.getElevation(lats[x], lons[y])
-print elevs
+em = ElevationDataManager(s)
+
+#lats = np.linspace(-10,10,num)
+#lons = np.linspace(-20, 30, num)
+lons = np.linspace(10,12, num)
+lats = np.linspace(40, 42, num)
+
+
+data = em.getData(lats, lons)
+#elevs = np.ones((num,num))
+#for x in range(num):
+#    print "X", x
+#    for y in range(num):
+#        #print elevs.shape, lats.shape
+#        elevs[x,y]=s.getElevation(lats[x], lons[y])
+#elevs, lon, lat = s.getBlock(-12, 57)
+#elevs = np.clip(elevs, 0, 3000)
 import matplotlib.pyplot as plt
-print np.max(np.max(elevs))
-print np.min(np.min(elevs))
-plt.imshow(np.fliplr(np.flipud(elevs)))
+#plt.imshow(np.fliplr(np.flipud(elevs)))
+plt.imshow(np.clip(data, 0, 10000))
 plt.show()
 print "test", s.getElevation(57.5,-13.5)
 #s.buildIndex()
