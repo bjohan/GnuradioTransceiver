@@ -4,6 +4,7 @@ import os
 import math
 import zipfile
 import numpy as np
+import sys
 from BeautifulSoup import BeautifulSoup
 
 class SrtmCache:
@@ -225,16 +226,21 @@ class ElevationDataManager:
         cLat = lats[0]
         cLon = lons[0]
         lati = len(lats);
-        while cLat < lats[-1]:
+        while lati > 0:
             loni = 0;
             while cLon < lons[-1]:
                 #print "Getting", cLon, cLat
                 elevs, lona, lata = self.ds.getBlock(cLat, cLon)
                 rlat = self.resampleNearest(lats, lata)
                 rlon = self.resampleNearest(lons, lona)
+                resampledElevations = elevs[np.meshgrid(rlat, rlon)]
+                print "max amplitude raw", np.max(elevs), "resampled", np.max(resampledElevations)
                 print "Lat, lon", lati, loni, "size", len(rlat), len(rlon)
+                sys.stdin.read(1)
                 try:
-                    data[np.meshgrid(range(lati, lati+len(rlat)), range(loni, loni+len(rlon)))]= elevs[np.meshgrid(rlat, rlon)]
+                    arrgrid = np.meshgrid(range(lati-len(rlat), lati), range(loni, loni+len(rlon)))
+                    print arrgrid
+                    data[arrgrid]= elevs[np.meshgrid(rlat, rlon)]
                 except:
                     print "BEEEP"
                 #print elevs[np.meshgrid(rlon, rlon)]
@@ -259,8 +265,8 @@ em = ElevationDataManager(s)
 
 #lats = np.linspace(-10,10,num)
 #lons = np.linspace(-20, 30, num)
-lons = np.linspace(10,12, num)
-lats = np.linspace(40, 42, num)
+lons = np.linspace(109,112, num)
+lats = np.linspace(50, 52, num)
 
 
 data = em.getData(lats, lons)

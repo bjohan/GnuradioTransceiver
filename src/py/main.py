@@ -10,6 +10,7 @@ from kivy.clock import Clock
 from kivy.config import Config
 from kivy.core.window import Window
 from mapwidget import MapWidget
+from af_widget import AfWidget
 import encoder
 
 
@@ -23,6 +24,10 @@ class VfoScreen(GridLayout):
 	self.tabs = TabbedPanel(size_hint=(1.0, 0.8))	
 	self.tabs.default_tab_text = 'RX/TX control'
 	self.tabs.default_tab_content = Label(text="rtx")
+
+        self.afTab = TabbedPanelHeader(text="AF")
+        self.afTab.content = AfWidget() #Label(text="AF control");
+        self.tabs.add_widget(self.afTab)
 
 	self.modTab = TabbedPanelHeader(text='Modulation')
 	self.modTab.content = Label(text="Select modulation")

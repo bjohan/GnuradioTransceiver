@@ -94,23 +94,23 @@ module speakerGrillHoles(d){
 }
 
 module speakersPlaced(){
-    translate([30, -speakerOffset, 19+2]){
+    translate([33, -speakerOffset, 19]){
         rotate([-90+speakerAngle, 0, 0])
             speaker();
     }
-    translate([insideX+2*t-30, -speakerOffset, 19+2]){
+    translate([insideX+2*t-33, -speakerOffset, 19]){
         rotate([-90+speakerAngle, 0, 0])
             speaker();
     }
 }
 
 module speakersGrillHolesPlaced(d){
-    translate([30, -speakerOffset, 19+2]){
+    translate([33, -speakerOffset, 19]){
         rotate([-90+speakerAngle, 0, 0])
             translate([0,0,1])
             speakerGrillHoles(d);
     }
-    translate([insideX+2*t-30, -speakerOffset, 19+2]){
+    translate([insideX+2*t-33, -speakerOffset, 19]){
         rotate([-90+speakerAngle, 0, 0])
             translate([0,0,1])
             speakerGrillHoles(d);
@@ -118,11 +118,11 @@ module speakersGrillHolesPlaced(d){
 }
 
 module speakerSlotsPlaced(){
-    translate([30, -speakerOffset, 19+2]){
+    translate([33, -speakerOffset, 19]){
         rotate([-90+speakerAngle, 0, 0])
             speakerSlot();
     }
-    translate([insideX+2*t-30, -speakerOffset, 19+2]){
+    translate([insideX+2*t-33, -speakerOffset, 19]){
         rotate([-90+speakerAngle, 0, 0])
             speakerSlot();
     }
@@ -495,8 +495,8 @@ module lid(){
                 //cube([insideX, insideY, insideZ+0.1]);
         }
     }
-    translate([15,0,0])
-    battery();
+    //translate([15,0,0])
+    //battery();
 }
 
 
@@ -511,13 +511,13 @@ module electronicsConsoleBody(){
             cube([153+16, 99+25, 3]);
             difference(){
                 union(){
-                    translate([10-5, 8, -25])
+                    translate([10-5+3, 8, -25])
                         rotate([speakerAngle, 0, 0])
-                            cube([45, 22, 30]);
+                            cube([45, 24, 30]);
                     
-                    translate([10-5+insideX+2*t-60, 8, -25])
+                    translate([10-5-3+insideX+2*t-60, 8, -25])
                         rotate([speakerAngle, 0, 0])
-                            cube([45, 22, 30]);
+                            cube([45, 24, 30]);
                 }
                 
                 translate([0,-1,3])
@@ -552,22 +552,22 @@ module electronicsConsole(){
 
 //raspi();
 //raspiHoles(50);
-electronicsConsole();
-raspiPlaced(false);
-displayPlaced();
+//electronicsConsole();
+//raspiPlaced(false);
+//displayPlaced();
 
 //raspiPlaced(true);
 
-boxDisplayAssembly();
-speakersPlaced();
+//boxDisplayAssembly();
+//speakersPlaced();
 //translate([-50, -50, 43])
 //cube([100, 100, 1]);
 
 //raspiPlaced();
 //encoderAssemblyPlaced(true, 40);
 //boxWithHoles();
-lidPlaced();
-//lid();
+//lidPlaced();
+lid();
 
 //box();
 //dvmPlaced();

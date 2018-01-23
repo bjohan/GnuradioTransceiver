@@ -39,7 +39,54 @@ class SdrDeviceBase:
 	def listClockSources(self):
 		print "Warning unimplemented listClockSources"
 		return []
+
+        def setRxSampleRate(self, rate):
+            print "Warning, unimplemented setRxSampleRate"
+            return false
+
+        def getRxSampleRate(self, rate):
+            print "Warning, unimplemented getRxSampleRate"
+            return 0
+
+        def setSampleRate(self, rate):
+            r = self.setRxSampleRate(rate)
+            t = self.setTxSampleRate(rate)
+            return (r,t)
 	
+        def setTxSampleRate(self):
+            print "Warning, unimplemented setTxSampleRate"
+            return false
+
+        def getTxSampleRate(self):
+            print "Warning, unimplemented getTxSampleRate"
+            return 0
+
+        def getSampleRate(self):
+            return {'rx':self.getRxSampleRate(), 'tx':self.getTxSampleRate()}
+
+        def setTxFrequency(self, f):
+           print "Warning, unimplemented setTxFrequency"
+           return false
+
+        def getTxFrequency(self, f):
+           print "Warning, unimplemented getTxFrequency"
+           return false
+
+        def setRxFrequency(self, f):
+           print "Warning, unimplemented setRxFrequency"
+           return 0
+
+        def getRxFrequency(self, f):
+           print "Warning, unimplemented getRxFrequency"
+           return 0
+
+        def getFrequency(self):
+            return {'rx':self.getRxFrequency(), 'tx':self.getTxFrequency()}
+
+        def setFrequency(self, f):
+            self.setRxFrequency(f)
+            self.setTxFrequency(f)
+
 	def getDeviceDescription(self):
 		return {
 			'antennas':self.listAntennas(),
