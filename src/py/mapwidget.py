@@ -17,7 +17,7 @@ from kivy.resources import resource_find
 import random
 import numpy as np
 
-
+import srtmManager
 
 class Renderer(Widget):
     def __init__(self, zs, ps, **kwargs):
@@ -99,7 +99,8 @@ class Renderer(Widget):
         L = 1201
         with open('O33/N57E012.hgt') as hgt:
             elevations = np.fromfile(hgt, np.dtype('>i2', L*L)).reshape((L,L))
-
+        elevations = srtmManager.data
+        
         return elevations[500:500+sx, 500:500+sy]/100.0
         #return np.random.rand(sx, sy)*za
 
@@ -144,7 +145,7 @@ class Renderer(Widget):
                 
 
     def generateMesh(self):
-        hgt = self.generateHeightData(100, 100, 0.1);
+        hgt = self.generateHeightData(200, 200, 0.1);
         norm = self.calcNormals(hgt)
         idcs = self.generateTriangleCounterClockWiseIndices(hgt)
         print hgt.shape

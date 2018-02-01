@@ -221,55 +221,94 @@ class ElevationDataManager:
                 idx.append(i)
         return idx
                 
-    def getData(self, lats, lons):
-        data = np.zeros((lats.shape[0], lons.shape[0]))
-        cLat = lats[0]
-        cLon = lons[0]
-        lati = len(lats);
-        while lati > 0:
-            loni = 0;
-            while cLon < lons[-1]:
-                #print "Getting", cLon, cLat
-                elevs, lona, lata = self.ds.getBlock(cLat, cLon)
-                rlat = self.resampleNearest(lats, lata)
-                rlon = self.resampleNearest(lons, lona)
-                resampledElevations = elevs[np.meshgrid(rlat, rlon)]
-                print "max amplitude raw", np.max(elevs), "resampled", np.max(resampledElevations)
-                print "Lat, lon", lati, loni, "size", len(rlat), len(rlon)
-                sys.stdin.read(1)
-                try:
-                    arrgrid = np.meshgrid(range(lati-len(rlat), lati), range(loni, loni+len(rlon)))
-                    print arrgrid
-                    data[arrgrid]= elevs[np.meshgrid(rlat, rlon)]
-                except:
-                    print "BEEEP"
-                #print elevs[np.meshgrid(rlon, rlon)]
+    def getData(self, xs, ys):
+        #Ok unable to remember which is latitude and which is longitude.
+        #x is longitude, and y is latitude. 
+        print "x range is", xs[0], xs[-1], "yrange is", ys[0], ys[-1]
+        import matplotlib.pyplot as plt
+        data = np.zeros((xs.shape[0], ys.shape[0]))
+        cX = xs[0]
+        cY = ys[0]
+        yi = len(ys);
+        while yi > 0:
+            print "new row"
+            xi = 0;
+            while cX < xs[-1]:
+                print "Getting", cX, cY
+                elevs, xa, ya = self.ds.getBlock(cY, cX) #in arguments are reversed....
+                #plt.imshow(np.clip(elevs, 0, 10000))
+                #plt.title("Loaded from srtm");
                 #print data[0:len(rlon), 0:len(rlat)].shape#, elevs[rlon, rlat].shape
-                cLon = lona[rlon[-1]]
-                loni += len(rlon)
-                print lati, loni
+                print "Contains x values (long)", xa[0], xa[-1], "y values (lat)", ya[0], ya[-1]
+                rx = self.resampleNearest(xs, xa)
+                ry = self.resampleNearest(ys, ya)
+                #print "resampled x (lon)", rx
+                #print "resampled y (lat)", ry
+                resampledElevations = np.transpose(elevs[np.meshgrid(ry, rx)])
+                #plt.figure()
+                #plt.imshow(np.clip(resampledElevations, 0, 10000))
+                #plt.title('Resampled elevations')
+                #print "max amplitude raw", np.max(elevs), "resampled", np.max(resampledElevations)
+                print "xi, y", xi, yi, "size", len(rx), len(ry)
+                #sys.stdin.read(1)
+                try:
+                    #print "X: got", len(rx), "samples, starting from ", xi
+                    #print "Y: got", len(ry), "samples, starting from ", yi
+                    xind =range(xi, xi+len(rx))
+                    yind = range(yi-len(ry), yi)
+                    #print "X indexes", xind
+                    #print "Y indexes", yind
+                    #arrgrid = np.array(np.meshgrid(yind, xind))
+                    #print arrgrid
+                    #print "print elevation data shape", resampledElevations.shape
+                    resampledElevations = np.fliplr(resampledElevations)
+                    for i in range(len(xind)):
+                        #print i
+                        for j in range(len(yind)):
+                            di = xind[i]
+                            dj = yind[j]
+                            #print di, dj, i, j
+                            data[dj, di] = resampledElevations[j,i]
+                    
+                    #print "output destination shape", data[xind, yind]
+                    #data[yind, xind]= resampledElevations
+                except Exception as e:
+                    print "BEEEP", e
+                #print elevs[np.meshgrid(rlon, rlon)]
+                #plt.imshow(np.fliplr(np.flipud(elevs)))
+                #plt.imshow(np.clip(data, 0, 10000))
+                #plt.figure();
+                #plt.imshow(np.clip(data, 0, 10000))
+                #plt.title('Appended to result');
+                #plt.show()
+                #print data[0:len(rlon), 0:len(rlat)].shape#, elevs[rlon, rlat].shape
+                cX = xa[rx[-1]]
+                xi += len(rx)
+                #print "xi, yi", xi, yi
                 #print "rlat", rlat, "rlon", rlon
-            lati-=len(rlat)
-            cLon = lons[0]
-            cLat = lata[rlat[-1]]
+            yi-=len(ry)
+            cX = xs[0]
+            cY = ys[-yi]
         print "Done getting data"
         return data;
  
 
 
 
-num = 200
+num = 1201
 s = srtmManager()
 
 em = ElevationDataManager(s)
 
 #lats = np.linspace(-10,10,num)
 #lons = np.linspace(-20, 30, num)
-lons = np.linspace(109,112, num)
-lats = np.linspace(50, 52, num)
+#lons = np.linspace(56,58, num)
+#lats = np.linspace(11, 12, num)
 
+lons = np.linspace(109+7,112+10, num)
+lats = np.linspace(50-10, 54, num)
 
-data = em.getData(lats, lons)
+data = em.getData(lons, lats)
 #elevs = np.ones((num,num))
 #for x in range(num):
 #    print "X", x
