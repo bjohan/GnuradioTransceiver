@@ -70,6 +70,11 @@ module tftGlass(){
     cube([165, 100, 1.4]);
 }
 
+module flatFlexVolume(){
+    translate([135, -8, 0])
+        cube([30, 8, 6.4]);
+}
+
 module tft(){
     difference(){
         tftBezel();
@@ -80,6 +85,8 @@ module tft(){
         tftDisplayArea(5);
     translate([0,-3,5])
         tftGlass();
+
+    flatFlexVolume();
 }
 
 

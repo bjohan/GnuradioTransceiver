@@ -558,7 +558,7 @@ module electronicsConsole(){
 
 //raspiPlaced(true);
 
-//boxDisplayAssembly();
+boxDisplayAssembly();
 //speakersPlaced();
 //translate([-50, -50, 43])
 //cube([100, 100, 1]);
@@ -567,7 +567,7 @@ module electronicsConsole(){
 //encoderAssemblyPlaced(true, 40);
 //boxWithHoles();
 //lidPlaced();
-lid();
+//lid();
 
 //box();
 //dvmPlaced();

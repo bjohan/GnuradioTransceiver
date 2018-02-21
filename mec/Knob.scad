@@ -1,6 +1,6 @@
 //Knob parameters
 knurlR = 4/2;
-knobR = 50/2;
+knobR = 40/2;
 knurlH =20;
 knurlStickout = knurlR;
 gripRimW = knurlR;
@@ -72,8 +72,10 @@ module knobBody(){
 }
 
 module knobAssembly(){
-    grip();
-    knobBody();
+    color([0,0,0]){
+        grip();
+        knobBody();
+    }
 }
 
-//knobAssembly();
+knobAssembly();
