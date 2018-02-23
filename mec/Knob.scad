@@ -1,6 +1,6 @@
 //Knob parameters
 knurlR = 4/2;
-knobR = 40/2;
+knobR = 50/2;
 knurlH =20;
 knurlStickout = knurlR;
 gripRimW = knurlR;
