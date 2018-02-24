@@ -107,7 +107,14 @@ module mainEnclosureBody(top){
 }
 
 module enclosureTop(){
-    mainEnclosureBody(true);
+    difference(){
+        mainEnclosureBody(true);
+        placeDisplay()
+    toPcbTop()
+        toPcbEdge()
+            placeTftBezel()
+            tftDisplayArea(100);
+    }
 }
 
 module enclosureBottomUntrimmed(){
@@ -115,14 +122,29 @@ module enclosureBottomUntrimmed(){
     placeSpeakerA()
         speakerBlock();
     difference(){
-        placeSpeakerB()
-            speakerBlock();
+        union(){
+            placeSpeakerB()
+                speakerBlock();
+            placeDisplay()
+                displayPosts();
+        }
         placeKnobEncoderAssembly()
         minkowski(){
             encoderWithHoles();
             sphere(7);
         }
+        placeSpeakerA()
+            speakerSlot();
+        placeRaspi(){
+            minkowski(){
+                raspi();
+                sphere(3);
+            }
+        }
     }
+
+   placeRaspi()
+        raspiPosts();
     
    placeKnobEncoderAssembly()
         encoderBrace();
@@ -195,9 +217,28 @@ module encoderBrace(){
     }
 }
 
+module displayPosts(){
+    translate([0,0,-100])
+    difference(){
+        pcbHoles(10, 100);
+        pcbHoles(3/2, 101);
+            
+    }
+}
+
+module raspiPosts(){
+    difference(){
+        translate([0,0,-4])
+        raspiScrewHoles(10,60);
+        raspiScrewHoles(2.5/2,60); 
+    }
+}
+
 enclosureBottom();
-//enclosureTop();
-//assembledComponents();
+
+translate([0,0,150])
+enclosureTop();
+assembledComponents();
 //encoderBrace();
 //encoderHoles();
 //knobEncoderAssembly();

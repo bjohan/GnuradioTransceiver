@@ -92,16 +92,20 @@ module raspiHoles(d){
             cube([18+10, 14, 2]);
     }
     r=2.65/2;
-    translate([22.2+r,2.2+r,-1-d])
-        cylinder(5+d,r,r);
-    translate([22.2+r,51+r,-1-d])
-        cylinder(5+d,r,r);
-    translate([80+r,2.2+r,-1-d])
-        cylinder(5+d,r,r);
-    translate([80+r,51+r,-1-d])
-        cylinder(5+d,r,r);
+    raspiScrewHoles(r, d);
 }
 
+module raspiScrewHoles(hr, d){
+    r=2.65/2;
+    translate([22.2+r,2.2+r,-1-d])
+        cylinder(5+d,hr,hr);
+    translate([22.2+r,51+r,-1-d])
+        cylinder(5+d,hr,hr);
+    translate([80+r,2.2+r,-1-d])
+        cylinder(5+d,hr,hr);
+    translate([80+r,51+r,-1-d])
+        cylinder(5+d,hr,hr);
+}
 
 //raspi();
 raspiHoles(50);
