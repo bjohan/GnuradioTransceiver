@@ -6,14 +6,19 @@ use <speaker.scad>
 
 bix = 180;
 biy = 150;
-biz = 40;
+biz = 44;
 or = 10;
 wt = 3;
 
+module placeKnobOnEncoder(){
+    translate([0,0,42])
+        children();
+}
+
 module knobEncoderAssembly(){
     encoderWithHoles();
-    translate([0,0,42])
-        knobAssembly();
+        placeKnobOnEncoder()
+            knobAssembly();
     
 }
 
@@ -25,7 +30,8 @@ translate([bix+or-wt-36-22,30,-20])
 }
 
 module placeDisplay(){
-    children();
+    translate([0,0,0.5])
+        children();
 }
 
 
@@ -56,7 +62,7 @@ module roundedCube(size, r){
 
 
 module mainEnclosure(mainDim, r, t){
-        translate([0,0,-38]){
+        translate([0,0,-biz+2]){
        difference(){
             roundedCube(mainDim, r);
             //translate([t, t, t])
@@ -72,6 +78,8 @@ module mainEnclosureWithHoles(mainDim, r, t){
             speakerHole();
         placeSpeakerB()
             speakerHole();
+        placeKnobEncoderAssembly()
+            knobOpening();
         
     }
     placeSpeakerA()
@@ -92,14 +100,14 @@ module mainEnclosureBody(top){
             intersection(){
                 mainEnclosureWithHoles(mainDim, r, t);
                 translate([-20, -20, 0])
-                    translate([0,0,-38])
+                    translate([0,0,-biz+2])
                         cube([300, 300, 300]);
             }
         } else {
             difference(){
                 mainEnclosureWithHoles(mainDim, r, t);
                 translate([-20, -20, 0])
-                translate([0,0,-38])
+                translate([0,0,-biz+2])
                     cube([300, 300, 300]);
             }
         }
@@ -110,10 +118,10 @@ module enclosureTop(){
     difference(){
         mainEnclosureBody(true);
         placeDisplay()
-    toPcbTop()
-        toPcbEdge()
-            placeTftBezel()
-            tftDisplayArea(100);
+        toPcbTop()
+            toPcbEdge()
+                placeTftBezel()
+                tftDisplayArea(100);
     }
 }
 
@@ -156,7 +164,7 @@ module enclosureBottom(){
     mainDim = [bix, biy, biz];
     intersection(){
         enclosureBottomUntrimmed();
-        translate([0,0,-38])
+        translate([0,0,-biz+2])
             roundedCube(mainDim, or);
     }
 }
@@ -220,7 +228,7 @@ module encoderBrace(){
 module displayPosts(){
     translate([0,0,-100])
     difference(){
-        pcbHoles(10, 100);
+        pcbHoles(8, 100);
         pcbHoles(3/2, 101);
             
     }
@@ -229,16 +237,27 @@ module displayPosts(){
 module raspiPosts(){
     difference(){
         translate([0,0,-4])
-        raspiScrewHoles(10,60);
+        raspiScrewHoles(8,60);
         raspiScrewHoles(2.5/2,60); 
     }
 }
 
-enclosureBottom();
+module knobOpening(){
+    ox = 100;
+    oy = 35;
+    oz = 22+1;
+    placeKnobOnEncoder(){
+        cylinder(22+1, 63/2+1, 63/2+1);
+        translate([-ox/2, -oy/2, 0])
+            cube([ox, oy, oz]);
+    }
 
-translate([0,0,150])
-enclosureTop();
-assembledComponents();
+}
+//enclosureBottom();
+//translate([0,0,150])
+//enclosureTop();
+knobAssembly();
+//assembledComponents();
 //encoderBrace();
 //encoderHoles();
 //knobEncoderAssembly();
