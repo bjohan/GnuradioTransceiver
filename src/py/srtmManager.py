@@ -125,10 +125,12 @@ class srtmManager:
     def getBlock(self, lat, lon):
         """ get a datablock containing lat and lon"""
 
-       
+        lat = int(lat)
+        lon = int(lon) 
         L = 1201
         #Get name of the zip file containing data from cache.  
         if (int(lat), int(lon)) not in self.srtms:
+            print "Lat", lat, "Lon", lon, "is probably sea"
             elevations = np.zeros((1201, 1201))
         else:
             url = self.srtms[(int(lat), int(lon))]
@@ -227,6 +229,7 @@ class ElevationDataManager:
         print "x range is", xs[0], xs[-1], "yrange is", ys[0], ys[-1]
         import matplotlib.pyplot as plt
         data = np.zeros((xs.shape[0], ys.shape[0]))
+        print "shape of destination is", data.shape
         cX = xs[0]
         cY = ys[0]
         yi = len(ys);
@@ -234,6 +237,7 @@ class ElevationDataManager:
             print "new row"
             xi = 0;
             while cX < xs[-1]:
+                print 30*"="
                 print "Getting", cX, cY
                 elevs, xa, ya = self.ds.getBlock(cY, cX) #in arguments are reversed....
                 #plt.imshow(np.clip(elevs, 0, 10000))
@@ -242,9 +246,12 @@ class ElevationDataManager:
                 print "Contains x values (long)", xa[0], xa[-1], "y values (lat)", ya[0], ya[-1]
                 rx = self.resampleNearest(xs, xa)
                 ry = self.resampleNearest(ys, ya)
-                #print "resampled x (lon)", rx
-                #print "resampled y (lat)", ry
+                print "resampled x (lon)", rx
+                print "X-vals", xa[rx]
+                print "resampled y (lat)", ry
+                print "Y-vals", ya[ry]
                 resampledElevations = np.transpose(elevs[np.meshgrid(ry, rx)])
+                print "resampled shape", resampledElevations.shape
                 #plt.figure()
                 #plt.imshow(np.clip(resampledElevations, 0, 10000))
                 #plt.title('Resampled elevations')
@@ -252,28 +259,151 @@ class ElevationDataManager:
                 print "xi, y", xi, yi, "size", len(rx), len(ry)
                 #sys.stdin.read(1)
                 try:
-                    #print "X: got", len(rx), "samples, starting from ", xi
-                    #print "Y: got", len(ry), "samples, starting from ", yi
+                    print "X: got", len(rx), "samples, starting from ", xi
+                    print "Y: got", len(ry), "samples, starting from ", yi
                     xind =range(xi, xi+len(rx))
                     yind = range(yi-len(ry), yi)
-                    #print "X indexes", xind
-                    #print "Y indexes", yind
+                    print "X indexes", xind
+                    print "Y indexes", yind
                     #arrgrid = np.array(np.meshgrid(yind, xind))
                     #print arrgrid
                     #print "print elevation data shape", resampledElevations.shape
                     resampledElevations = np.fliplr(resampledElevations)
-                    for i in range(len(xind)):
-                        #print i
-                        for j in range(len(yind)):
-                            di = xind[i]
-                            dj = yind[j]
-                            #print di, dj, i, j
-                            data[dj, di] = resampledElevations[j,i]
+                    data[np.meshgrid(xind, yind)] = resampledElevations;
+                    #for i in range(len(xind)):
+                    #    #print i
+                    #    for j in range(len(yind)):
+                    #        #try :
+                    #            di = xind[i]
+                    #            dj = yind[j]
+                    #            #print di, dj, i, j
+                    #            data[dj, di] = resampledElevations[j,i]
+                    #        #except Exception as e:
+                    #        #    print "Missed",(di, dj), (j, i)
+                    #        #    print e
                     
                     #print "output destination shape", data[xind, yind]
                     #data[yind, xind]= resampledElevations
                 except Exception as e:
+                    import traceback
                     print "BEEEP", e
+                    traceback.print_exc()
+                #print elevs[np.meshgrid(rlon, rlon)]
+                #plt.imshow(np.fliplr(np.flipud(elevs)))
+                #plt.imshow(np.clip(data, 0, 10000))
+                #plt.figure();
+                #plt.imshow(np.clip(data, 0, 10000))
+                #plt.title('Appended to result');
+                #plt.show()
+                #print data[0:len(rlon), 0:len(rlat)].shape#, elevs[rlon, rlat].shape
+                cX = xa[rx[-1]]
+                xi += len(rx)
+                #print "xi, yi", xi, yi
+                #print "rlat", rlat, "rlon", rlon
+            yi-=len(ry)
+            cX = xs[0]
+            cY = ys[-yi]
+        print "Done getting data"
+        return data;
+ 
+    def getData2(self, xs, ys):
+        import matplotlib.pyplot as plt
+        #Ok unable to remember which is latitude and which is longitude.
+        #x is longitude, and y is latitude. 
+        print "x range is", xs[0], xs[-1], "yrange is", ys[0], ys[-1]
+        data = np.zeros((xs.shape[0], ys.shape[0]))
+        print "shape of destination is", data.shape
+        
+
+        yToGet = ys
+        yi = 0
+        while len(yToGet) > 0:
+            xi = 0
+            xToGet = xs
+            while len(xToGet) > 0:
+                #print 30*"="
+                #print "Remaining x samples", xToGet
+                elevs, xa, ya = self.ds.getBlock(yToGet[0], xToGet[0])
+                #print "Contains x values (long)", xa[0], xa[-1], "y values (lat)", ya[0], ya[-1]
+                rx = self.resampleNearest(xToGet, xa)
+                ry = self.resampleNearest(yToGet, ya)
+                #print "resampled x (lon)", rx
+                #print "X-vals", xa[rx]
+                #print "resampled y (lat)", ry
+                #print "Y-vals", ya[ry]
+                resampledElevations = np.transpose(elevs[np.meshgrid(ry, rx)])
+                #print "resampled shape", resampledElevations.shape
+                xind =range(xi, xi+len(rx))
+                yind = range(yi, yi+len(ry))
+                #print "dest X indexes", xind
+                #print "dest Y indexes", yind
+                resampledElevations = np.flipud(np.fliplr(resampledElevations))
+                data[np.meshgrid(xind, yind)] = resampledElevations;
+                xToGet = xToGet[len(xind):]
+                xi += len(xind)
+            #print 40*'*'
+            yToGet = yToGet[len(yind):]
+            yi += len(yind)
+        return data
+
+        cX = xs[0]
+        cY = ys[0]
+        yi = len(ys);
+        while yi > 0:
+            print "new row"
+            xi = 0;
+            while cX < xs[-1]:
+                print 30*"="
+                print "Getting", cX, cY
+                elevs, xa, ya = self.ds.getBlock(cY, cX) #in arguments are reversed....
+                #plt.imshow(np.clip(elevs, 0, 10000))
+                #plt.title("Loaded from srtm");
+                #print data[0:len(rlon), 0:len(rlat)].shape#, elevs[rlon, rlat].shape
+                print "Contains x values (long)", xa[0], xa[-1], "y values (lat)", ya[0], ya[-1]
+                rx = self.resampleNearest(xs, xa)
+                ry = self.resampleNearest(ys, ya)
+                print "resampled x (lon)", rx
+                print "X-vals", xa[rx]
+                print "resampled y (lat)", ry
+                print "Y-vals", ya[ry]
+                resampledElevations = np.transpose(elevs[np.meshgrid(ry, rx)])
+                print "resampled shape", resampledElevations.shape
+                #plt.figure()
+                #plt.imshow(np.clip(resampledElevations, 0, 10000))
+                #plt.title('Resampled elevations')
+                #print "max amplitude raw", np.max(elevs), "resampled", np.max(resampledElevations)
+                print "xi, y", xi, yi, "size", len(rx), len(ry)
+                #sys.stdin.read(1)
+                try:
+                    print "X: got", len(rx), "samples, starting from ", xi
+                    print "Y: got", len(ry), "samples, starting from ", yi
+                    xind =range(xi, xi+len(rx))
+                    yind = range(yi-len(ry), yi)
+                    print "X indexes", xind
+                    print "Y indexes", yind
+                    #arrgrid = np.array(np.meshgrid(yind, xind))
+                    #print arrgrid
+                    #print "print elevation data shape", resampledElevations.shape
+                    resampledElevations = np.fliplr(resampledElevations)
+                    data[np.meshgrid(xind, yind)] = resampledElevations;
+                    #for i in range(len(xind)):
+                    #    #print i
+                    #    for j in range(len(yind)):
+                    #        #try :
+                    #            di = xind[i]
+                    #            dj = yind[j]
+                    #            #print di, dj, i, j
+                    #            data[dj, di] = resampledElevations[j,i]
+                    #        #except Exception as e:
+                    #        #    print "Missed",(di, dj), (j, i)
+                    #        #    print e
+                    
+                    #print "output destination shape", data[xind, yind]
+                    #data[yind, xind]= resampledElevations
+                except Exception as e:
+                    import traceback
+                    print "BEEEP", e
+                    traceback.print_exc()
                 #print elevs[np.meshgrid(rlon, rlon)]
                 #plt.imshow(np.fliplr(np.flipud(elevs)))
                 #plt.imshow(np.clip(data, 0, 10000))
@@ -294,8 +424,7 @@ class ElevationDataManager:
  
 
 
-
-num = 1201
+num = 1000
 s = srtmManager()
 
 em = ElevationDataManager(s)
@@ -305,10 +434,11 @@ em = ElevationDataManager(s)
 #lons = np.linspace(56,58, num)
 #lats = np.linspace(11, 12, num)
 
-lons = np.linspace(109+7,112+10, num)
-lats = np.linspace(50-10, 54, num)
+lons = np.linspace(-7,-4, num)
+lats = np.linspace(57, 60, num)
 
-data = em.getData(lons, lats)
+data = em.getData2(lons, lats)
+data = np.fliplr(np.flipud(np.transpose(data)))
 #elevs = np.ones((num,num))
 #for x in range(num):
 #    print "X", x
