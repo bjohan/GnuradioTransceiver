@@ -11,6 +11,7 @@ from kivy.config import Config
 from kivy.core.window import Window
 from mapwidget import MapWidget
 from af_widget import AfWidget
+from fftWidget import FftWidget
 import encoder
 
 
@@ -43,7 +44,7 @@ class VfoScreen(GridLayout):
 
 	self.fftTab = TabbedPanelHeader(text='FFT')
 	self.tabs.add_widget(self.fftTab)
-	self.fftTab.content = Label(text="FFT");
+	self.fftTab.content = FftWidget() # Label(text="FFT");
 
 	self.mapTab = TabbedPanelHeader(text="Map")
 	self.tabs.add_widget(self.mapTab)

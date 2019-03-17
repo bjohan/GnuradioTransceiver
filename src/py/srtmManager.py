@@ -136,6 +136,7 @@ class srtmManager:
             url = self.srtms[(int(lat), int(lon))]
             cachename = self.cache.getUrl(url)
             zipname = os.path.basename(cachename)[:-4]
+            print "Loading", zipname
 
             #Open the zip file
             try:
@@ -179,7 +180,7 @@ class srtmManager:
             with zipfile.ZipFile(cachename) as f:
                 zipname = f.namelist()[0]
                 if f.namelist()[0]:
-                    #print "Loading", zipname
+                    print "Loading", zipname
                     try:
                         with f.open(zipname) as hgt:
                             L = 1201
@@ -424,21 +425,21 @@ class ElevationDataManager:
  
 
 
-num = 1000
+num = 500
 s = srtmManager()
 
 em = ElevationDataManager(s)
 
-#lats = np.linspace(-10,10,num)
-#lons = np.linspace(-20, 30, num)
+##lats = np.linspace(-10,0,num)
+##lons = np.linspace(-20, 0, num)
 #lons = np.linspace(56,58, num)
 #lats = np.linspace(11, 12, num)
 
-lons = np.linspace(-7,-4, num)
-lats = np.linspace(57, 60, num)
+#lons = np.linspace(10,13, num)
+#lats = np.linspace(56, 58, int(num/3))
 
-data = em.getData2(lons, lats)
-data = np.fliplr(np.flipud(np.transpose(data)))
+##data = em.getData2(lons, lats)
+##data = np.fliplr(np.flipud(np.transpose(data)))
 #elevs = np.ones((num,num))
 #for x in range(num):
 #    print "X", x
@@ -447,9 +448,9 @@ data = np.fliplr(np.flipud(np.transpose(data)))
 #        elevs[x,y]=s.getElevation(lats[x], lons[y])
 #elevs, lon, lat = s.getBlock(-12, 57)
 #elevs = np.clip(elevs, 0, 3000)
-import matplotlib.pyplot as plt
+##import matplotlib.pyplot as plt
 #plt.imshow(np.fliplr(np.flipud(elevs)))
-plt.imshow(np.clip(data, 0, 10000))
-plt.show()
-print "test", s.getElevation(57.5,-13.5)
+##plt.imshow(np.clip(data, 0, 10000), extent=[lons[-1], lons[1], lats[0], lats[-1]])
+##plt.show()
+##print "test", s.getElevation(57.5,-13.5)
 #s.buildIndex()

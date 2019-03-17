@@ -24,11 +24,11 @@ class Renderer(Widget):
         super(Renderer, self).__init__(**kwargs)
         self.canvas = RenderContext(compute_normal_mat=True)
         self.canvas.shader.source = resource_find('simple.glsl')
-        self._keyboard = Window.request_keyboard(self._keyboard_closed, self)   
+        #self._keyboard = Window.request_keyboard(self._keyboard_closed, self)   
         self.zs = zs
         self.ps = ps
-        self._keyboard.bind(on_key_down=self._on_keyboard_down)
-        self._keyboard.bind(on_key_up=self._on_keyboard_up)
+        #self._keyboard.bind(on_key_down=self._on_keyboard_down)
+        #self._keyboard.bind(on_key_up=self._on_keyboard_up)
         self.shiftDown = False
         #self.scene = ObjFile(resource_find("monkey.obj"))
         with self.canvas:
@@ -96,13 +96,13 @@ class Renderer(Widget):
 
     def generateHeightData(self, sx, sy, za):
     
-        #L = 1201
-        #with open('O33/N57E012.hgt') as hgt:
-        #    elevations = np.fromfile(hgt, np.dtype('>i2', L*L)).reshape((L,L))
+        L = 1201
+        with open('O33/N57E012.hgt') as hgt:
+            elevations = np.fromfile(hgt, np.dtype('>i2', L*L)).reshape((L,L))
         #elevations = srtmManager.data
         
-        #return 10+elevations/10000.0 #elevations[500:500+sx, 500:500+sy]/100.0
-        return np.random.rand(sx, sy)*za
+        return elevations[500:500+sx, 500:500+sy]/100.0
+        #return np.random.rand(sx, sy)*za
 
     def calcNormals(self, hgt):
         normals = np.ones((hgt.shape[0], hgt.shape[1], 3))
@@ -197,7 +197,7 @@ class MyPaintWidget(Widget):
 
 
 
-class MapWidget(GridLayout):
+class FftWidget(GridLayout):
     def __init__(self, **kwargs):
         self.rows = 1
         self.cols = 1

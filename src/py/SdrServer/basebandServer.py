@@ -1,3 +1,5 @@
+import matplotlib.pyplot as plt
+import kivyPlot
 import SoapySDR
 from SoapySDR import * #SOAPY_SDR_ constants
 import numpy as np#use numpy for buffers
@@ -10,9 +12,13 @@ class SdrDevice(SdrDeviceBase):
         self.bbdev = bbdev
         self.sdr = SoapySDR.Device(bbdev)
         self.rxStreamActiveState = False;
-        self.txStreamActiveState = True;
+        self.txStreamActiveState = False;
         self.rxStream = None
         self.txStream = None
+        #print dir(self.sdr)
+        #print help(self.sdr.setGainMode)
+        self.sdr.setGainMode(SOAPY_SDR_RX,0,False)
+        self.sdr.setGain(SOAPY_SDR_RX, 0, 0*100)
     
     def listAntennas(self):
         return {'rx': self.sdr.listAntennas(SOAPY_SDR_RX, 0),
@@ -95,6 +101,8 @@ class SdrDevice(SdrDeviceBase):
                     self.rxStreamActiveState = True
                 else:
                     print "Error activating stream"
+        else:
+            print "No rxstream"
         return self.rxStreamActiveState
 
     def getRxSamples(self, n):
@@ -103,35 +111,92 @@ class SdrDevice(SdrDeviceBase):
         if not self.rxStreamIsActive():
             self.activateRxStream()
         buff = np.array([0]*int(n), np.complex64)
+        #print "Reading"
         sr = self.sdr.readStream(self.rxStream, [buff], len(buff))
-        if sr < 0:
+        if sr.ret < 0:
             print "ERROR while reading samples"
-        print sr
+        #print sr
+        #print buff
         return buff
+
+#tx
+    def hasTxStream(self):
+        return self.txStream is not None
+
+    def createTxStream(self):
+        if not self.hasTxStream():
+            print "Creating TX stream"
+            self.txStream = self.sdr.setupStream(SOAPY_SDR_TX, SOAPY_SDR_CF32)
    
+    def txStreamIsActive(self):
+        if self.hasTxStream():
+            return self.txStreamActiveState
+        return False
+        
+    def activateTxStream(self):
+        if self.hasTxStream():
+            if not self.txStreamActiveState:
+                print "Activating TX stream"
+                s = self.sdr.activateStream(self.txStream)
+                if s == 0:
+                    self.txStreamActiveState = True
+                else:
+                    print "Error activating stream"
+        return self.txStreamActiveState
+
+    def putTxSamples(self, samples):
+        if self.txStream is None:
+            self.createTxStream()
+        if not self.txStreamIsActive():
+            self.activateTxStream()
+        #buff = np.array([0]*int(n), np.complex64)
+        sr = self.sdr.writeStream(self.txStream, [samples], len(samples))
+        #sr = self.sdr.readStream(self.rxStream, [buff], len(buff))
+        if sr < 0:
+            print "ERROR while writing samples"
+        #print sr
+        return sr
+
+
+
+print "dfsdf",SOAPY_SDR_TIMEOUT 
 #enumerate devices
 results = SoapySDR.Device.enumerate()
 print "Got", len(results), "devices"
 devs = []
 for result in results:
+    print result
     devs.append(SdrDevice(result))
 
-
-for d in devs:
-    print d
-    d.setSampleRate(1e6)
-    print "Sample rates", d.getSampleRate()
-    d.setFrequency(99.4e6)
-    print "Center frequencies", d.getFrequency()
-    s = d.getRxSamples(10e3)
-    print "Number of samples read", len(s)
-    print np.sum(s)
-exit(0)
+if True:
+    for d in devs:
+        d = SdrDevice({'driver':'hackrf'})
+        print d
+        d.setSampleRate(1e6)
+        print "Sample rates", d.getSampleRate()
+        d.setFrequency(99.4e6)
+        print "Center frequencies", d.getFrequency()
+        for a in range(30000):
+            s = d.getRxSamples(32768)
+            #print len(s)
+            kivyPlot.plot(np.log10(np.abs(np.fft.fftshift(np.fft.fft(s)))+1))
+            #kivyPlot.plot(np.abs(s))
+            #plt.hold(False)
+            #plt.plot(s)
+            #plt.draw()
+            #plt.pause(0.02)
+            #print "Number of samples read", len(s)
+            print np.sum(s)
+        for a in range(20):
+            stat = d.putTxSamples(s)
+            print stat
+#   plt.show()
+    exit(0)
 
 #for dev in devs:
 #   print dev.getDeviceDescription()
 #   print dev
-    #print dir(dev.getDeviceDescription()['frequencies']['rx'][0])
+    #prin dir(dev.getDeviceDescription()['frequencies']['rx'][0])
     #print dev.getDeviceDescription()['frequencies']['rx'][0]
     #print dev.getDeviceDescription()['frequencies']['rx'].index
     #for a in dir(dev.sdr):
@@ -149,39 +214,47 @@ exit(0)
 sdr = SoapySDR.Device({'driver':'hackrf'})
 
 #query device info
-print(sdr.listAntennas(SOAPY_SDR_RX, 0))
-print(sdr.listGains(SOAPY_SDR_RX, 0))
-freqs = sdr.getFrequencyRange(SOAPY_SDR_RX, 0)
-for freqRange in freqs: print("F"+str(freqRange))
+#print(sdr.listAntennas(SOAPY_SDR_RX, 0))
+#print(sdr.listGains(SOAPY_SDR_RX, 0))
+#freqs = sdr.getFrequencyRange(SOAPY_SDR_RX, 0)
+#for freqRange in freqs: print("F"+str(freqRange))
 
+print "Setting up rtx"
 #apply settings
-sdr.setSarpleRate(SOAPY_SDR_RX, 0, 1e6)
-sdr.setFrequency(SOAPY_SDR_RX, 0, 99.4e6)
-sdr.setSampleRate(SOAPY_SDR_TX, 0, 1e6)
-sdr.setFrequency(SOAPY_SDR_TX, 0, 99.4e6)
+sdr.setSampleRate(SOAPY_SDR_RX, 0, 1e6)
+sdr.setFrequency(SOAPY_SDR_RX, 0, 99.4e7)
+#sdr.setSampleRate(SOAPY_SDR_TX, 0, 1e6)
+#sdr.setFrequency(SOAPY_SDR_TX, 0, 99.4e7)
 
+print "Setting up streams"
 #setup a stream (complex floats)
 rxStream = sdr.setupStream(SOAPY_SDR_RX, SOAPY_SDR_CF32)
-txStream = sdr.setupStream(SOAPY_SDR_TX, SOAPY_SDR_CF32)
+#txStream = sdr.setupStream(SOAPY_SDR_TX, SOAPY_SDR_CF32)
 sdr.activateStream(rxStream) #start streaming
 
 #create a re-usable buffer for rx samples
-buff = numpy.array([0]*1024, numpy.complex64)
-
+buff = np.array([0]*8192, np.complex64)
+print "receiving"
 #receive some samples
-for i in range(1000):
+plt.show()
+for i in range(10):
     sr = sdr.readStream(rxStream, [buff], len(buff))
+    plt.hold(False)
+    plt.plot(np.abs(np.fft.fftshift(np.fft.fft(buff))))
+    plt.draw()
+    plt.pause(0.002)
     #print(sr.ret) #num samples or error code
     #print(sr.flags) #flags set by receive operation
     #print(sr.timeNs) #timestamp for receive buffer
-
+#plt.plot( np.real(buff))
+plt.show()
 #shutdown the stream
 sdr.deactivateStream(rxStream) #stop streaming
-
+print "transmitting"
 sdr.activateStream(txStream)
 for i in range(1000):
     sr = sdr.writeStream(txStream, [buff], len(buff))
-    #print sr
+    print sr
 sdr.deactivateStream(txStream)
 sdr.closeStream(txStream)
 sdr.closeStream(rxStream)
