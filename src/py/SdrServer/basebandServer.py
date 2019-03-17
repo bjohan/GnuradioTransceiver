@@ -18,7 +18,7 @@ class SdrDevice(SdrDeviceBase):
         #print dir(self.sdr)
         #print help(self.sdr.setGainMode)
         self.sdr.setGainMode(SOAPY_SDR_RX,0,False)
-        self.sdr.setGain(SOAPY_SDR_RX, 0, 0*100)
+        self.sdr.setGain(SOAPY_SDR_RX, 0, 70+0*100)
     
     def listAntennas(self):
         return {'rx': self.sdr.listAntennas(SOAPY_SDR_RX, 0),
@@ -153,7 +153,8 @@ class SdrDevice(SdrDeviceBase):
         sr = self.sdr.writeStream(self.txStream, [samples], len(samples))
         #sr = self.sdr.readStream(self.rxStream, [buff], len(buff))
         if sr < 0:
-            print "ERROR while writing samples"
+            #print "ERROR while writing samples"
+            return []
         #print sr
         return sr
 
@@ -174,19 +175,20 @@ if True:
         print d
         d.setSampleRate(1e6)
         print "Sample rates", d.getSampleRate()
-        d.setFrequency(99.4e6)
+        d.setFrequency(145e6)
         print "Center frequencies", d.getFrequency()
         for a in range(30000):
             s = d.getRxSamples(32768)
             #print len(s)
-            kivyPlot.plot(np.log10(np.abs(np.fft.fftshift(np.fft.fft(s)))+1))
-            #kivyPlot.plot(np.abs(s))
+            #kivyPlot.plot(np.log10(np.abs(np.fft.fftshift(np.fft.fft(s)))+1))
+            if len(s):
+                kivyPlot.plot(np.real(s))
             #plt.hold(False)
             #plt.plot(s)
             #plt.draw()
             #plt.pause(0.02)
             #print "Number of samples read", len(s)
-            print np.sum(s)
+            #print np.sum(s)
         for a in range(20):
             stat = d.putTxSamples(s)
             print stat

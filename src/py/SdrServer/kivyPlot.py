@@ -6,6 +6,8 @@ This demonstrates the use of a mesh mode to distort an image. You should see
 a line of buttons across the bottom of a canvas. Pressing them displays
 the mesh, a small circle of points, with different mesh.mode settings.
 '''
+import os
+#os.environ["KIVY_NO_CONSOLELOG"] = "1"
 import numpy as np
 from kivy.uix.button import Button
 from kivy.uix.widget import Widget
@@ -17,54 +19,73 @@ from math import cos, sin, pi
 import threading
 import time
 
-
 class PlotWidget(Widget):
     def __init__(self):
         self.xdata = np.array(range(10))
         self.ydata = np.array(range(10))
+        self.lock = threading.Lock()
         super(PlotWidget, self).__init__()
-        with self.canvas:
-            self.mesh = self.build_mesh()
+        self.register_event_type('on_update_plot')
+        self.on_update_plot()
+        #with self.canvas:
+        #    self.mesh = self.build_mesh()
 
-    def plot(self, idata):
-        t0 = time.time()
-        if len(idata.shape) > 1:
-            data = idata[:,0]
-        else:
-            data = idata
-        self.ydata = np.array(data);
-        self.xdata = np.array(range(len(data)))
+    def on_update_plot(self):
+        width = self.size[0]
+        height = self.size[1]
+        self.minx = np.min(self.xdata)
+        self.maxx = np.max(self.xdata)
+        self.xr = self.maxx-self.minx;
+        self.xs = float(width)/self.xr;
+        self.miny = np.min(self.ydata)
+        self.maxy = np.max(self.ydata)
+        self.yr = self.maxy-self.miny;
+        self.ys = float(height)/self.yr;
+        self.drawMesh()
+
+
+    def drawGraticule(self):
+        #print self.miny, self.maxy, self.yr
+        tenlog = 10**np.floor(np.log10(self.yr))
+        print self.yr, self.yr/tenlog
+
+    def drawMesh(self):
         self.canvas.clear()
+        self.drawGraticule()
         with self.canvas:
             Color(0,1.0,0)
             self.mesh = self.build_mesh()
-        #print "Render rate", 1/(time.time()-t0)
 
+    def plot(self, idata):
+        if self.lock.locked():
+            return
+        with self.lock:
+            t0 = time.time()
+            if len(idata.shape) > 1:
+                data = idata[:,0]
+            else:
+                data = idata
+            self.ydata = np.array(data);
+            self.xdata = np.array(range(len(data)))
+        #self.drawMesh()
+        self.dispatch('on_update_plot')
+        #print "Render rate", 1/(time.time()-t0)
+    
 
     def build_mesh(self):
-        """ returns a Mesh of a rough circle. """
-        vertices = []
-        indices = []
-        width = self.size[0]
-        height = self.size[1]
-        minx = np.min(self.xdata)
-        maxx = np.max(self.xdata)
-        xr = maxx-minx;
-        xs = float(width)/xr;
-        miny = np.min(self.ydata)
-        maxy = np.max(self.ydata)
-        yr = maxy-miny;
-        ys = float(height)/yr;
-        t0 = time.time()
-        zm = np.zeros(self.xdata.shape)
-        v2 = np.vstack(((self.xdata-minx)*xs, (self.ydata-miny)*ys, zm, zm)).T
-        indices = range(len(self.xdata))
-        vertices = v2.ravel()
+        with self.lock:
+            vertices = []
+            indices = []
+            t0 = time.time()
+            zm = np.zeros(self.xdata.shape)
+            v2 = np.vstack(((self.xdata-self.minx)*self.xs, (self.ydata-self.miny)*self.ys, zm, zm)).T
+            indices = range(len(self.xdata))
+            vertices = v2.ravel()
         return Mesh(vertices=vertices, indices=indices, mode='line_strip')
     
 
 
-class MeshTestApp(App):
+class KivyPlotApp(App):
     def __init__(self):
         self.x = range(10)
         self.y = range(10)
@@ -123,7 +144,7 @@ def plot(vectors):
     global mta
     mta.plot(vectors)
 
-mta = MeshTestApp()
+mta = KivyPlotApp()
 def launch():
     global mta
     #mta = MeshTestApp()
