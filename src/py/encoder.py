@@ -9,10 +9,10 @@ class EncoderThread(threading.Thread):
 		self.q = Queue.Queue()
 		self.callback = callback
 		self.last = None
-		try:
-			self.s = serial.Serial(port, 9600)
-		except:
-			self.s = None
+		#try:
+		#	self.s = serial.Serial(port, 9600)
+		#except:
+		self.s = None
 		self.start()
 
 	def run(self):

@@ -18,7 +18,7 @@ class SdrDevice(SdrDeviceBase):
         #print dir(self.sdr)
         #print help(self.sdr.setGainMode)
         self.sdr.setGainMode(SOAPY_SDR_RX,0,False)
-        self.sdr.setGain(SOAPY_SDR_RX, 0, 70+0*100)
+        self.sdr.setGain(SOAPY_SDR_RX, 0, 0+0*100)
     
     def listAntennas(self):
         return {'rx': self.sdr.listAntennas(SOAPY_SDR_RX, 0),
@@ -169,30 +169,33 @@ for result in results:
     print result
     devs.append(SdrDevice(result))
 
-if True:
-    for d in devs:
-        d = SdrDevice({'driver':'hackrf'})
-        print d
-        d.setSampleRate(1e6)
-        print "Sample rates", d.getSampleRate()
-        d.setFrequency(145e6)
-        print "Center frequencies", d.getFrequency()
-        for a in range(30000):
-            s = d.getRxSamples(32768)
-            #print len(s)
-            #kivyPlot.plot(np.log10(np.abs(np.fft.fftshift(np.fft.fft(s)))+1))
-            if len(s):
-                kivyPlot.plot(np.real(s))
-            #plt.hold(False)
-            #plt.plot(s)
-            #plt.draw()
-            #plt.pause(0.02)
-            #print "Number of samples read", len(s)
-            #print np.sum(s)
-        for a in range(20):
-            stat = d.putTxSamples(s)
-            print stat
-#   plt.show()
+try:
+    if True:
+        for d in devs:
+            d = SdrDevice({'driver':'hackrf'})
+            print d
+            d.setSampleRate(1e6)
+            print "Sample rates", d.getSampleRate()
+            d.setFrequency(145e6)
+            print "Center frequencies", d.getFrequency()
+            for a in range(30000):
+                s = d.getRxSamples(32768/8)
+                #print len(s)
+                kivyPlot.plot(np.abs(np.fft.fftshift(np.fft.fft(s-np.mean(s)))))
+                #if len(s):
+                #    kivyPlot.plot(np.real(s))
+                #plt.hold(False)
+                #plt.plot(s)
+                #plt.draw()
+                #plt.pause(0.02)
+                #print "Number of samples read", len(s)
+                #print np.sum(s)
+            for a in range(20):
+                stat = d.putTxSamples(s)
+                print stat
+except KeyboardInterrupt:
+    kivyPlot.stop()
+    kivyPlot.join();
     exit(0)
 
 #for dev in devs:

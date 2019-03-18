@@ -13,7 +13,8 @@ from kivy.uix.button import Button
 from kivy.uix.widget import Widget
 from kivy.uix.boxlayout import BoxLayout
 from kivy.app import App
-from kivy.graphics import Mesh, Color
+from kivy.graphics import Mesh, Color, Rectangle
+from kivy.core.text import Label as CoreLabel
 from functools import partial
 from math import cos, sin, pi
 import threading
@@ -31,23 +32,59 @@ class PlotWidget(Widget):
         #    self.mesh = self.build_mesh()
 
     def on_update_plot(self):
-        width = self.size[0]
-        height = self.size[1]
+        self.width = self.size[0]
+        self.height = self.size[1]
         self.minx = np.min(self.xdata)
         self.maxx = np.max(self.xdata)
         self.xr = self.maxx-self.minx;
-        self.xs = float(width)/self.xr;
+        self.xs = float(self.width)/self.xr;
         self.miny = np.min(self.ydata)
         self.maxy = np.max(self.ydata)
         self.yr = self.maxy-self.miny;
-        self.ys = float(height)/self.yr;
+        self.ys = float(self.height)/self.yr;
         self.drawMesh()
 
+    def drawText(self, pos, text, font_size = 12):
+        l = CoreLabel(text=text, font_size = font_size)
+        l.refresh()
+        Rectangle(pos=pos, size=l.size, texture=l.texture)
 
-    def drawGraticule(self):
-        #print self.miny, self.maxy, self.yr
-        tenlog = 10**np.floor(np.log10(self.yr))
-        print self.yr, self.yr/tenlog
+    def drawGraticule(self, lines = 10):
+        hLines = np.linspace(0,self.height, lines)
+        vLines = np.linspace(0,self.width,lines)
+        vs = self.computeScaleLines(self.minx, self.maxx, lines)
+        hs = self.computeScaleLines(self.miny, self.maxy, lines)
+
+        with self.canvas:
+            Color(1.00,0.0,0)
+            self.mesh = self.buildGraticule(hLines, vLines)
+        with self.canvas:
+            Color(1.0,1.0,1.0)
+            self.drawGraticuleText(hLines, vLines, hs, vs)
+
+    def computeScaleLines(self, mi, ma, num):
+        return np.linspace(mi, ma, num)
+
+    def drawGraticuleText(self, hlines, vlines, hvalues, vvalues, font_size = 12):
+        hci = np.round(len(hlines)/2)
+        vci = np.round(len(vlines)/2)
+        for (v, i) in zip(vlines, vvalues):
+            self.drawText((v,hlines[hci]-font_size-1), "%.3e"%(i), font_size = font_size)
+        for (h, i) in zip(hlines, hvalues):
+            self.drawText((vlines[vci],h), "%.3e"%(i), font_size = font_size)
+
+    def buildGraticule(self, hlines, vlines):
+        vt = []
+        indices = []
+        for h in hlines:
+            vt.extend([0,h, 0,0, self.width, h,0,0])
+
+        for v in vlines:
+            vt.extend([v, 0, 0,0, v, self.height,0,0])
+        indices.extend(range(len(vt)/4))
+
+
+        return Mesh(vertices=vt, indices=indices, mode='lines')
 
     def drawMesh(self):
         self.canvas.clear()
@@ -99,43 +136,12 @@ class KivyPlotApp(App):
     def plot(self, data):
         if self.wid is not None:
             self.wid.plot(data)
-    #    print data
-    #    self.y = data;
-    #    self.x = range(len(data))
-    #    #with self.widget.canvas:
-    #    #    self.mesh = self.build_mesh()
-
-    #def build_mesh(self):
-    #    """ returns a Mesh of a rough circle. """
-    #    vertices = []
-    #    indices = []
-    #    step = 10
-    #    istep = (pi * 2) / float(step)
-    #    for i in range(step): #range(len(self.x)):
-    #        print self.y
-    #        x = 300 + cos(istep * i) * 100+self.x[i]*10
-    #        y = 300 + sin(istep * i) * 100+self.y[i]*10
-    #        vertices.extend([x, y, 0, 0])
-    #        indices.append(i)
-    #    print "Updated plot"
-    #    return Mesh(vertices=vertices, indices=indices)
     
     def build(self):
         self.wid = PlotWidget()
         print "build"
-        #with wid.canvas:
-        #    self.mesh = self.build_mesh()
-
-        #layout = BoxLayout(size_hint=(1, None), height=50)
-        #for mode in ('points', 'line_strip', 'line_loop', 'lines',
-        #        'triangle_strip', 'triangle_fan'):
-        #    button = Button(text=mode)
-        #    button.bind(on_release=partial(self.change_mode, mode))
-        #    layout.add_widget(button)
-
         root = BoxLayout(orientation='vertical')
         root.add_widget(self.wid)
-        #root.add_widget(layout)
 
         return root
 

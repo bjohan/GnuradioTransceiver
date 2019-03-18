@@ -24,8 +24,8 @@ module knobEncoderAssembly(){
 
 
 module placeKnobEncoderAssembly(){
-translate([bix+or-wt-36-22,30,-20])
-    rotate([0,90,0])
+translate([bix/2-8,40+10,-30+5])
+    rotate([0,90-10,-90])
         children();
 }
 
@@ -37,7 +37,7 @@ module placeDisplay(){
 
 module placeRaspi(){
     placeDisplay()
-        translate([108,85+62,-17])
+        translate([15+0*108,0*85+62+45,-17])
             rotate([0,0,-90])
                 children();
 }
@@ -48,7 +48,7 @@ module placeSpeakerA(){
 }
 
 module placeSpeakerB(){
-    translate([165-60,-or+wt,-20])
+    translate([165-60+30,-or+wt,-20])
         rotate([-90,0,0])
             children();
 }
@@ -253,11 +253,14 @@ module knobOpening(){
     }
 
 }
-//enclosureBottom();
+enclosureBottom();
 //translate([0,0,150])
-//enclosureTop();
-knobAssembly();
-//assembledComponents();
+//intersection(){
+enclosureTop();
+//translate([-15, -15, -70])
+//cube([80, 30, 100]);}
+//knobAssembly();
+assembledComponents();
 //encoderBrace();
 //encoderHoles();
 //knobEncoderAssembly();
