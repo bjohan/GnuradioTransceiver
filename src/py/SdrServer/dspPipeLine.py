@@ -16,3 +16,11 @@ class DspPipeLine:
             p.stop()
             
 
+    def status(self):
+        lt = 0
+        for p in self.pipes:
+            rate = (p.computeTime/p.computed) 
+            num = p.q.qsize()
+            print p.desc, num, "%.2e"%(rate), 
+            lt+=rate*(num+1)
+        print "lat %.2fms"%(lt*1000)

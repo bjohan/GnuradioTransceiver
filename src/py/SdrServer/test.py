@@ -57,6 +57,7 @@ dsp.start()
 try:
     while True:
         time.sleep(1)
+        dsp.status()
 except KeyboardInterrupt:
     print "stopping dsp pipeline"
     dsp.stop()

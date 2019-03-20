@@ -14,6 +14,8 @@ class DspPipe(threading.Thread):
             self.desc+=p.name+' '
         self.d = 0
         self.tot = 0
+        self.computed = 0
+        self.computeTime = 0
         self.done = False
 
     
@@ -38,12 +40,14 @@ class DspPipe(threading.Thread):
                     si = self.q.get(timeout=0.01);
                 else:
                     si = None
-
+                t0 = time.time()
                 for p in self.processors:
                     so = p.process(si)
                     si = so
                 for o in self.out:
                     o.putSamples(so)
+                self.computed+=1
+                self.computeTime += time.time()-t0
                 so = None
                 si = None
             except Queue.Empty:
