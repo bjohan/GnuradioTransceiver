@@ -49,6 +49,8 @@ class PlotWidget(Widget):
         self.miny = np.min(self.ydata)
         self.maxy = np.max(self.ydata)
         self.yr = self.maxy-self.miny;
+        if self.yr == 0:
+            self.yr = 1.0
         self.ys = float(self.height)/self.yr;
         self.drawMesh()
 

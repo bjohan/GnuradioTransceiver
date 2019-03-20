@@ -29,7 +29,7 @@ class DspPipe(threading.Thread):
     def run(self):
 
         print self.desc, "is runing"
-        prctl.set_name("DSP pipe "+self.desc)
+        prctl.set_name(self.desc)
         while True:
             if self.done:
                 break

@@ -36,7 +36,8 @@ class SoundDevice(threading.Thread):
             outdata[0:ns] = self.obuf[0:ns]
             self.obuf = self.obuf[ns:]
             if ns < len(outdata):
-                outdata[ns:] = outdata[ns:]*0
+                outdata[ns:] = indata[ns:]*0
+
         self.ol.release()
 
         self.il.acquire()
@@ -83,42 +84,4 @@ class SoundDevice(threading.Thread):
 
 
 sd.default.samplerate = 44000
-sd.default.channels = 2
-print "Creating sound device"
-d  = SoundDevice()
-cs = 0;
-def generateSamples():
-    global d
-    global cs
-    while True:
-        tv = np.linspace(cs,cs+8191,8192);
-        yv = np.sin(tv/10.0)*0.1
-        d.putSamples(np.vstack((yv, yv)).T)
-        cs += 8192
-        time.sleep(0.1)
-
-#thr = threading.Thread(target=generateSamples)
-#thr.start()
-try:
-    while True:
-        #plt.hold(False)
-        s = d.getSamples(32768)
-        if s != []:
-            #print "plot", s
-            kivyPlot.plot(s)
-            #plt.plot(s)
-            #plt.draw()
-            #plt.pause(0.000001)
-        else:
-            time.sleep(0.001)
-except KeyboardInterrupt:
-    print "Control-C pressed, shuting down"
-
-
-#print "Waiting for thread to join"
-#time.sleep(3)
-kivyPlot.stop()
-d.stop()
-d.join()
-#print "Done"
-kivyPlot.join()
+sd.default.channels = 1
