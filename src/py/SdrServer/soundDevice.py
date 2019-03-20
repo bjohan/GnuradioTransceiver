@@ -102,7 +102,7 @@ def generateSamples():
 try:
     while True:
         #plt.hold(False)
-        s = d.getSamples(1024)
+        s = d.getSamples(32768)
         if s != []:
             #print "plot", s
             kivyPlot.plot(s)

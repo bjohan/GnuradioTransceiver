@@ -122,16 +122,14 @@ class SdrDeviceBase:
 	def __str__(self):
 		ret = "SDR device info\n"
 		ret+= "="*len(ret)+'\n'
-		for p in self.bbdev.items():
-			ret+="%s: %s\n"%p
 		ret+=self.rtxDictToString("RX antennas: ", "TX antennas: ", self.listAntennas())
 		ret+=self.rtxDictToString("RX gains: ", "TX gains: ", self.listGains())
 		ret+=self.rtxDictToString("RX freqs: ", "TX freqs: ", self.listFreqs())
 		ret+=self.rtxDictToString("RX bw: ", "TX bw: ", self.listBandwidths())
 		ret+=self.rtxDictToString("RX rates: ", "TX rates: ", self.listSampleRates())
 		ret+=self.tupleToString("Clocks: ", self.listClockSources())
-		ret+=str(self.getDeviceIdentifierString())
-
+                ret+="Device identifier::  "+str(self.getDeviceIdentifierString())
+                ret += "END OF DEVICE INFO"
 		ret+='\n'
 		return ret
 

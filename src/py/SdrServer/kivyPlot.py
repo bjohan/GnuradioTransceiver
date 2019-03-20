@@ -7,6 +7,7 @@ a line of buttons across the bottom of a canvas. Pressing them displays
 the mesh, a small circle of points, with different mesh.mode settings.
 '''
 import os
+import Queue
 #os.environ["KIVY_NO_CONSOLELOG"] = "1"
 import numpy as np
 from kivy.uix.button import Button
@@ -15,13 +16,16 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.app import App
 from kivy.graphics import Mesh, Color, Rectangle
 from kivy.core.text import Label as CoreLabel
+from kivy.clock import Clock
 from functools import partial
 from math import cos, sin, pi
 import threading
 import time
+import prctl
 
 class PlotWidget(Widget):
     def __init__(self):
+        self.q = Queue.Queue()
         self.xdata = np.array(range(10))
         self.ydata = np.array(range(10))
         self.lock = threading.Lock()
@@ -31,7 +35,11 @@ class PlotWidget(Widget):
         #with self.canvas:
         #    self.mesh = self.build_mesh()
 
-    def on_update_plot(self):
+    def on_update_plot(self, *args):
+        if not self.q.empty():
+            data = self.q.get()
+            self.ydata = np.array(data);
+            self.xdata = np.array(range(len(data)))
         self.width = self.size[0]
         self.height = self.size[1]
         self.minx = np.min(self.xdata)
@@ -49,7 +57,7 @@ class PlotWidget(Widget):
         l.refresh()
         Rectangle(pos=pos, size=l.size, texture=l.texture)
 
-    def drawGraticule(self, lines = 10):
+    def drawGraticule(self, lines = 11):
         hLines = np.linspace(0,self.height, lines)
         vLines = np.linspace(0,self.width,lines)
         vs = self.computeScaleLines(self.minx, self.maxx, lines)
@@ -88,24 +96,28 @@ class PlotWidget(Widget):
 
     def drawMesh(self):
         self.canvas.clear()
-        self.drawGraticule()
         with self.canvas:
             Color(0,1.0,0)
             self.mesh = self.build_mesh()
+        self.drawGraticule()
 
     def plot(self, idata):
-        if self.lock.locked():
-            return
-        with self.lock:
-            t0 = time.time()
-            if len(idata.shape) > 1:
-                data = idata[:,0]
-            else:
-                data = idata
-            self.ydata = np.array(data);
-            self.xdata = np.array(range(len(data)))
+        #if self.lock.locked():
+        #    return
+        #with self.lock:
+        t0 = time.time()
+        if len(idata.shape) > 1:
+            data = idata[:,0]
+        else:
+            data = idata
+        if self.q.qsize() < 10:
+            self.q.put(data)
+        else:
+            pass
+            #print "Plot data drop"
+            #self.ydata = np.array(data);
+            #self.xdata = np.array(range(len(data)))
         #self.drawMesh()
-        self.dispatch('on_update_plot')
         #print "Render rate", 1/(time.time()-t0)
     
 
@@ -135,38 +147,35 @@ class KivyPlotApp(App):
 
     def plot(self, data):
         if self.wid is not None:
-            self.wid.plot(data)
+            if data is not None:
+                self.wid.plot(data)
+                #self.wid.dispatch('on_update_plot')
     
     def build(self):
         self.wid = PlotWidget()
         print "build"
         root = BoxLayout(orientation='vertical')
         root.add_widget(self.wid)
-
+        Clock.schedule_interval(self.wid.on_update_plot, 1.0/120)
         return root
 
-def plot(vectors):
-    pass
-    global mta
-    mta.plot(vectors)
+class Figure(threading.Thread):
+    def __init__(self):
+        self.lock = threading.Lock()
+        threading.Thread.__init__(self)
+        self.start()
 
-mta = KivyPlotApp()
-def launch():
-    global mta
-    #mta = MeshTestApp()
-    mta.run()
+    def run(self):
+        prctl.set_name("Kivy plot app thread")
+        self.kpa = KivyPlotApp()
+        self.kpa.run()
 
-def stop():
-    global mta
-    mta.stop()
-print "Starting plot Thread"
-plotThread = threading.Thread(target = launch, name = "kivy_plot")
-plotThread.start()
-print "Plot thread running"
+    def plot(self, data):
+        with self.lock:
+            self.kpa.plot(data)
 
-def join():
-    print "Waiting for plot threa to join"
-    plotThread.join()
+    def stop(self):
+        with self.lock:
+            self.kpa.stop()
 
-#if __name__ == '__main__':
-#    MeshTestApp().run()
+
