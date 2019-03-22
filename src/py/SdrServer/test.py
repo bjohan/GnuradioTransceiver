@@ -8,6 +8,7 @@ import plotSignalProcessor
 import dbSignalProcessor
 import limitSignalProcessor
 import decimationSignalProcessor
+import agcSignalProcessor
 import soundSinkProcessor
 import dspPipeLine
 import time
@@ -41,6 +42,7 @@ sndDev  = soundDevice.SoundDevice()
 print "Setting up processors"
 sdrsrc = sdrSourceProcessor.SdrSourceProcessor(sdr, samples = 32768)
 firdsp = firSignalProcessor.FirSignalProcessor(taps = 31, passBand=0.1);
+agcdsp = agcSignalProcessor.AgcSignalProcessor()
 fftdsp = fftSignalProcessor.FftSignalProcessor(samples=4096)
 dbdsp = dbSignalProcessor.DbSignalProcessor()
 decdsp = decimationSignalProcessor.DecimationSignalProcessor(factor=137)
@@ -49,7 +51,7 @@ sndsink = soundSinkProcessor.SoundSinkProcessor(sndDev);
 plotdsp = plotSignalProcessor.PlotSignalProcessor();
 
 
-dsp = dspPipeLine.DspPipeLine([ [sdrsrc], [firdsp], [decdsp], [sndsink], [fftdsp], [dbdsp, limitdsp], [plotdsp]])
+dsp = dspPipeLine.DspPipeLine([ [sdrsrc], [firdsp], [decdsp], [agcdsp], [sndsink], [fftdsp], [dbdsp, limitdsp], [plotdsp]])
 
 print "starting pipeline"
 dsp.start()
