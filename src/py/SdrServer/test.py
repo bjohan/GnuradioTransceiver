@@ -9,10 +9,12 @@ import dbSignalProcessor
 import limitSignalProcessor
 import decimationSignalProcessor
 import agcSignalProcessor
+import fmDemodSignalProcessor
 import soundSinkProcessor
 import dspPipeLine
 import time
 import soundDevice
+
 d = soapySdrDevice.SoapySdrManager()
 
 #list all sdr devices
@@ -30,11 +32,10 @@ else:
     exit(-1)
         
         
-sdr.setSampleRate(6e6)
+sdr.setSampleRate(2e6)
 print "Sample rates", sdr.getSampleRate()
-sdr.setFrequency(145e6)
+sdr.setFrequency(145.00e6)
 print "Center frequencies", sdr.getFrequency()
-
 
 print "Creating sound device"
 sndDev  = soundDevice.SoundDevice()
@@ -42,7 +43,8 @@ sndDev  = soundDevice.SoundDevice()
 print "Setting up processors"
 sdrsrc = sdrSourceProcessor.SdrSourceProcessor(sdr, samples = 32768)
 firdsp = firSignalProcessor.FirSignalProcessor(taps = 31, passBand=0.1);
-agcdsp = agcSignalProcessor.AgcSignalProcessor()
+fmdsp = fmDemodSignalProcessor.FmDemodSignalProcessor()
+agcdsp = agcSignalProcessor.AgcSignalProcessor(target=0.1, rate = 0)
 fftdsp = fftSignalProcessor.FftSignalProcessor(samples=4096)
 dbdsp = dbSignalProcessor.DbSignalProcessor()
 decdsp = decimationSignalProcessor.DecimationSignalProcessor(factor=137)
@@ -51,7 +53,7 @@ sndsink = soundSinkProcessor.SoundSinkProcessor(sndDev);
 plotdsp = plotSignalProcessor.PlotSignalProcessor();
 
 
-dsp = dspPipeLine.DspPipeLine([ [sdrsrc], [firdsp], [decdsp], [agcdsp], [sndsink], [fftdsp], [dbdsp, limitdsp], [plotdsp]])
+dsp = dspPipeLine.DspPipeLine([ [sdrsrc], [firdsp], [decdsp], [fmdsp], [plotdsp]])# [agcdsp], [sndsink], [fftdsp], [dbdsp, limitdsp], [plotdsp]])
 
 print "starting pipeline"
 dsp.start()
