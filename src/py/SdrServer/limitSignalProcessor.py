@@ -7,6 +7,6 @@ class LimitSignalProcessor(signalProcessor.SignalProcessor):
         self.ma = ma
 
 
-    def process(self, signalIn):
+    def processSimple(self, signalIn):
         return np.clip(signalIn,self.mi,self.ma)
 

@@ -7,6 +7,6 @@ class DbSignalProcessor(signalProcessor.SignalProcessor):
         self.factor = factor
         self.ref = ref
 
-    def process(self, signalIn):
-        return self.factor*np.log10(np.abs(signalIn)/self.ref)
+    def processSimple(self, signalIn):
+        return self.factor*np.log10(np.abs(signalIn.samples)/self.ref)
 

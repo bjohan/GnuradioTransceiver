@@ -6,7 +6,7 @@ class FirSignalProcessor(signalProcessor.SignalProcessor):
         signalProcessor.SignalProcessor.__init__(self, "FIR")
         self.taps  = scipy.signal.firwin(taps, passBand,width=transition, pass_zero=True)
 
-    def process(self, signalIn):
+    def processSimple(self, signalIn):
         #return scipy.signal.convolve(signalIn, self.taps, mode='valid')
         return np.convolve(signalIn, self.taps, mode='valid')
 

@@ -1,3 +1,4 @@
+import signal
 import signalProcessor
 import numpy as np
 class FftSignalProcessor(signalProcessor.SignalProcessor):
@@ -6,7 +7,10 @@ class FftSignalProcessor(signalProcessor.SignalProcessor):
         self.samples = samples
 
     def process(self, signalIn):
-        n = min(len(signalIn), self.samples)
-        s = signalIn[0:n]
-        return np.fft.fftshift(np.fft.fft(s-np.mean(s)))
+        signalOut = signal.Signal(baseSig=signalIn)
+        n = min(len(signalIn.samples), self.samples)
+        s = signalIn.samples[0:n]
+        signalOut.samples=np.fft.fftshift(np.fft.fft(s-np.mean(s)))
+        signalOut.domain='frequency'
+        return signalOut
 

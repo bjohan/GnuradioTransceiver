@@ -7,7 +7,7 @@ class SoundSinkProcessor(signalProcessor.SignalProcessor):
         signalProcessor.SignalProcessor.__init__(self, "audio")
         self.dev = sndDev
 
-    def process(self, signalIn):
+    def processSimple(self, signalIn):
         #print signalIn
         self.dev.putSamples(np.vstack((signalIn,signalIn)).T)
         return signalIn

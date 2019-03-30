@@ -1,3 +1,4 @@
+import dspSignal
 import signalProcessor
 import numpy as np
 class DecimationSignalProcessor(signalProcessor.SignalProcessor):
@@ -7,10 +8,12 @@ class DecimationSignalProcessor(signalProcessor.SignalProcessor):
         self.rest = []
 
     def process(self, signalIn):
-        allsample = np.hstack( (self.rest, signalIn))
+        signalOut = dspSignal.Signal(baseSig=signalIn)
+        allsample = np.hstack( (self.rest, signalIn.samples))
         outSample=np.floor(len(allsample)/self.factor)
         last = int(outSample*self.factor)
-        signalOut=allsample[0:last:self.factor]
+        signalOut.samples=allsample[0:last:self.factor]
         self.rest = allsample[last:]
+        signalOut.rate/=float(self.factor)
         return signalOut 
 

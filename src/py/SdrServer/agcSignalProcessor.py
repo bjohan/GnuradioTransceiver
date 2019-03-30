@@ -11,7 +11,7 @@ class AgcSignalProcessor(signalProcessor.SignalProcessor):
         self.overrange = 0
 
 
-    def process(self, signalIn):
+    def processSimple(self, signalIn):
         sabs = np.abs(signalIn)
         for i in range(len(signalIn)):
             newabs = sabs[i]*self.g
