@@ -14,6 +14,7 @@ import soundSinkProcessor
 import dspPipeLine
 import time
 import soundDevice
+import fftPlotSignalProcessor
 
 d = soapySdrDevice.SoapySdrManager()
 
@@ -48,12 +49,12 @@ agcdsp = agcSignalProcessor.AgcSignalProcessor(target=0.1, rate = 0)
 fftdsp = fftSignalProcessor.FftSignalProcessor(samples=4096)
 dbdsp = dbSignalProcessor.DbSignalProcessor()
 decdsp = decimationSignalProcessor.DecimationSignalProcessor(factor=137)
-limitdsp = limitSignalProcessor.LimitSignalProcessor(mi=-80.0)
+limitdsp = limitSignalProcessor.LimitSignalProcessor(mi=-0.0)
 sndsink = soundSinkProcessor.SoundSinkProcessor(sndDev);
 plotdsp = plotSignalProcessor.PlotSignalProcessor();
+plotfft = fftPlotSignalProcessor.FftPlotSignalProcessor()
 
-
-dsp = dspPipeLine.DspPipeLine([ [sdrsrc], [firdsp], [decdsp], [fmdsp], [plotdsp]])# [agcdsp], [sndsink], [fftdsp], [dbdsp, limitdsp], [plotdsp]])
+dsp = dspPipeLine.DspPipeLine([ [sdrsrc], [firdsp], [decdsp], [plotfft], [fmdsp], [plotdsp]])# [agcdsp], [sndsink], [fftdsp], [dbdsp, limitdsp], [plotdsp]])
 
 print "starting pipeline"
 dsp.start()
