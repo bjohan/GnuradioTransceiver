@@ -17,6 +17,7 @@ class DspPipe(threading.Thread):
         self.computed = 0
         self.computeTime = 0
         self.done = False
+        self.starv = False
 
     
     def putSamples(self, samples):
@@ -37,20 +38,27 @@ class DspPipe(threading.Thread):
                 break
             try:
                 if not self.processors[0].source:
-                    si = self.q.get(timeout=0.01);
+                    si = self.q.get(timeout=0.001);
+                    self.starv = False
                 else:
                     si = None
                 t0 = time.time()
                 for p in self.processors:
                     so = p.process(si)
+                    if so is None:
+                        break
                     si = so
-                for o in self.out:
-                    o.putSamples(so)
+                if so is not None:
+                    for o in self.out:
+                        o.putSamples(so)
                 self.computed+=1
                 self.computeTime += time.time()-t0
                 so = None
                 si = None
             except Queue.Empty:
+                if self.starv == False:
+                    #print self.desc, "starved"
+                    self.starv = True
                 if self.done:
                     break
         print self.desc, "is done, stopping"

@@ -37,6 +37,9 @@ class SoundDevice(threading.Thread):
             self.obuf = self.obuf[ns:]
             if ns < len(outdata):
                 outdata[ns:] = indata[ns:]*0
+        else:
+            #print "Obuf empty", len(indata), indata.shape
+            outdata[:] = indata*0
 
         self.ol.release()
 

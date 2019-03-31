@@ -7,7 +7,7 @@ import time
 class PlotSignalProcessor(signalProcessor.SignalProcessor):
     def __init__(self, title = plot):
         signalProcessor.SignalProcessor.__init__(self, "plot")
-        self.fig = plot.Figure(title)
+        self.fig = plot.Figure()
 
     def stop(self):
         self.fig.close()
@@ -15,6 +15,6 @@ class PlotSignalProcessor(signalProcessor.SignalProcessor):
     def process(self, signalIn):
         signalOut = dspSignal.Signal(baseSig = signalIn)
         x = np.arange(len(signalIn.samples))/signalIn.rate
-        self.fig.plot(x, signalIn.samples)
+        self.fig.plot(x, np.real(signalIn.samples))
         return signalOut
 

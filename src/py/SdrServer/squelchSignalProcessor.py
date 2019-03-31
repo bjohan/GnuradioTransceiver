@@ -2,28 +2,22 @@ import signalProcessor
 import dspSignal
 import numpy as np
 class SquelchSignalProcessor(signalProcessor.SignalProcessor):
-    def __init__(self, threshold=200, delay=0.5):
+    def __init__(self, threshold=200, hold=0.5):
         signalProcessor.SignalProcessor.__init__(self, "squelch")
-        self.overrange = 0
+        self.threshold = threshold
+        self.hold = hold
+        self.t = hold
 
 
-    def processSimple(self, signalIn):
-        signalOut = dspSignal.Signal(baseSig=signalIn)
-        
-        sabs = np.abs(signalIn)
-        for i in range(len(signalIn)):
-            newabs = sabs[i]*self.g
-            if newabs < self.target:
-                self.g*=(1.0+self.rate)
-            else: 
-                if newabs > self.maxAmp:
-                    self.overrange+=1
-                    if self.overrange >= self.overrangeNum:
-                        self.g = self.target/newabs
-                else:
-                    self.overrange = 0
-                    self.g*=(1.0-self.rate)
-            signalIn[i] *= self.g
-            
-        return signalIn
+
+    def process(self, signalIn):
+        signalOut = None
+        if max(np.abs(signalIn.samples)) > self.threshold:
+            self.t = 0.0;
+            signalOut = signalIn
+        if self.t < self.hold:
+            signalOut = signalIn
+
+        self.t += float(len(signalIn.samples))/float(signalIn.rate)
+        return signalOut
 

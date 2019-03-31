@@ -19,7 +19,10 @@ class DspPipeLine:
     def status(self):
         lt = 0
         for p in self.pipes:
-            rate = (p.computeTime/p.computed) 
+            if p.computed >0:
+                rate = (p.computeTime/p.computed) 
+            else:
+                rate = 0
             num = p.q.qsize()
             print p.desc, num, "%.2e"%(rate), 
             lt+=rate*(num+1)

@@ -200,8 +200,8 @@ class PlotWindow():
 
 class MyEventLoop(threading.Thread):
     def __init__(self):
-        self.l = threading.RLock()
         threading.Thread.__init__(self)
+        self.l = threading.RLock()
         self.done = False
 
     def stop(self):
@@ -246,11 +246,14 @@ class MyEventLoop(threading.Thread):
 
 
 el = MyEventLoop()
+print el
+print dir(el)
+exit()
 el.start()
 
-def Figure(arg, title):
-    global el
-    return el.newPlot(arg, title)
+#def Figure(arg, title):
+#    global el
+#    return el.newPlot(arg, title)
 
 #tnum = 20
 #np.random.seed(0)
@@ -267,24 +270,24 @@ def Figure(arg, title):
 #    g1 = Graticule(vmi, vma)
 #    print vmi, vma, g1.ticks
 
-f1 = Figure(1.0, "ett")
-f2 = Figure(0.5, "b")
+#f1 = Figure(1.0, "ett")
+#f2 = Figure(0.5, "b")
 #f3 = Figure(0.0, "3")
 #time.sleep(1)
 #print "Plot to f1"
 #f1.plot(np.random.rand(4)*10)
 #f1.plot2([0,1,2], [0,1,0.2])
-f1.plot2(y=np.random.rand(10), x = np.arange(10))
+#f1.plot2(y=np.random.rand(10), x = np.arange(10))
 #f1.plot(np.array(range(3)))
 #time.sleep(3)
 #print "plot to f2"
 #f2.plot(np.random.rand(5))
 
-try:
-    while True:
-        f1.plot2(y=np.random.rand(10), x = np.arange(10))
-        f2.plot2(y=np.random.rand(10), x = np.arange(10))
-        time.sleep(0.001)
-except KeyboardInterrupt:
-    el.stop()
+#try:
+#    while True:
+#        f1.plot2(y=np.random.rand(10), x = np.arange(10))
+#        f2.plot2(y=np.random.rand(10), x = np.arange(10))
+#        time.sleep(0.001)
+#except KeyboardInterrupt:
+#    el.stop()
 

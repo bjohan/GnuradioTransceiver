@@ -17,6 +17,8 @@ import soundDevice
 import fftPlotSignalProcessor
 import statusSignalProcessor
 import tuneSignalProcessor
+import squelchSignalProcessor
+
 
 d = soapySdrDevice.SoapySdrManager()
 
@@ -54,13 +56,15 @@ decdsp = decimationSignalProcessor.DecimationSignalProcessor(factor=91)
 limitdsp = limitSignalProcessor.LimitSignalProcessor(mi=-1, ma = 1)
 sndsink = soundSinkProcessor.SoundSinkProcessor(sndDev);
 plotdsp = plotSignalProcessor.PlotSignalProcessor("Demodulated fm");
+plotfm = plotSignalProcessor.PlotSignalProcessor("decimated td");
 plotfft = fftPlotSignalProcessor.FftPlotSignalProcessor("Decimated spectrum", nmax = 512)
 plotfftfull = fftPlotSignalProcessor.FftPlotSignalProcessor("full spectrum", nmax = 512)
 plotfftfir = fftPlotSignalProcessor.FftPlotSignalProcessor("firfiltered full spectrum", nmax=512)
+squelch = squelchSignalProcessor.SquelchSignalProcessor(threshold = 0.5, hold = 0.00000)
 
 statdsp = statusSignalProcessor.StatusSignalProcessor()
 tunedsp = tuneSignalProcessor.TuneSignalProcessor(nco=-1500)
-dsp = dspPipeLine.DspPipeLine([ [sdrsrc],[plotfftfull], [firdsp], [plotfftfir], [decdsp],[tunedsp], [plotfft], [fmdsp],[plotdsp], [agcdsp], [sndsink],[statdsp]])# [agcdsp], [sndsink], [fftdsp], [dbdsp, limitdsp], [plotdsp]])
+dsp = dspPipeLine.DspPipeLine([ [sdrsrc], [plotfftfull], [firdsp],[plotfftfir], [decdsp],[tunedsp], [plotfft], [plotfm], [squelch], [fmdsp],[plotdsp], [agcdsp],[sndsink], [statdsp]])# [agcdsp], [sndsink], [fftdsp], [dbdsp, limitdsp], [plotdsp]])
 
 print "starting pipeline"
 dsp.start()

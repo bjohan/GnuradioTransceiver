@@ -16,7 +16,7 @@ class PlotWindow:
         self.plotter = openglplot.PlotGl(w,h)
         self.window = glfw.create_window(w,h, title, None, None)
         #print "Is accelerated:", glfw.get_window_param(glfw.GLFW_ACCELERATED)
-        glfw.make_context_current(self.window)
+        #glfw.make_context_current(self.window)
         self.plotter.setupProjection()
         self.plotter.setData([0,1,2,3], [4,3,4,5])
         glfw.set_window_size_callback(self.window, self.resize_cb)
@@ -40,6 +40,7 @@ class PlotWindow:
 
 
     def refresh_cb(self, window):
+        #glfw.make_context_current(window)
         self.update()
 
     def presentData(self):
@@ -79,6 +80,7 @@ class PlotManager(threading.Thread):
             glfw.poll_events()
             with self.l:
                 for w in self.windows:
+                    glfw.make_context_current(w.window)
                     if glfw.window_should_close(w.window):
                         self.close(w)
                     else:
