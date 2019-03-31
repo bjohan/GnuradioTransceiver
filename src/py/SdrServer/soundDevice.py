@@ -3,7 +3,7 @@ import threading
 import sounddevice as sd
 import time
 import matplotlib.pyplot as plt
-import kivyPlot
+#import kivyPlot
 
 class SoundDevice(threading.Thread):
     def __init__(self):

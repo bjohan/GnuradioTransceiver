@@ -54,10 +54,13 @@ decdsp = decimationSignalProcessor.DecimationSignalProcessor(factor=91)
 limitdsp = limitSignalProcessor.LimitSignalProcessor(mi=-1, ma = 1)
 sndsink = soundSinkProcessor.SoundSinkProcessor(sndDev);
 plotdsp = plotSignalProcessor.PlotSignalProcessor("Demodulated fm");
-plotfft = fftPlotSignalProcessor.FftPlotSignalProcessor("Decimated spectrum")
+plotfft = fftPlotSignalProcessor.FftPlotSignalProcessor("Decimated spectrum", nmax = 512)
+plotfftfull = fftPlotSignalProcessor.FftPlotSignalProcessor("full spectrum", nmax = 512)
+plotfftfir = fftPlotSignalProcessor.FftPlotSignalProcessor("firfiltered full spectrum", nmax=512)
+
 statdsp = statusSignalProcessor.StatusSignalProcessor()
 tunedsp = tuneSignalProcessor.TuneSignalProcessor(nco=-1500)
-dsp = dspPipeLine.DspPipeLine([ [sdrsrc],[statdsp], [decdsp],[tunedsp], [plotfft], [fmdsp],[plotdsp], [agcdsp], [sndsink],[statdsp]])# [agcdsp], [sndsink], [fftdsp], [dbdsp, limitdsp], [plotdsp]])
+dsp = dspPipeLine.DspPipeLine([ [sdrsrc],[plotfftfull], [firdsp], [plotfftfir], [decdsp],[tunedsp], [plotfft], [fmdsp],[plotdsp], [agcdsp], [sndsink],[statdsp]])# [agcdsp], [sndsink], [fftdsp], [dbdsp, limitdsp], [plotdsp]])
 
 print "starting pipeline"
 dsp.start()

@@ -13,6 +13,7 @@ class TuneSignalProcessor(signalProcessor.SignalProcessor):
         phaseRate = 2.0*np.pi*self.nco/signalIn.rate
         phases = (self.ph+np.arange(len(signalIn.samples))*phaseRate)
         self.ph = phases[-1]+phaseRate
+        signalOut.shift += self.nco
         signalOut.samples = signalIn.samples*np.exp(1j*phases)
         return signalOut
 

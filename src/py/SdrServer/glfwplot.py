@@ -15,6 +15,7 @@ class PlotWindow:
         self.staged = None
         self.plotter = openglplot.PlotGl(w,h)
         self.window = glfw.create_window(w,h, title, None, None)
+        #print "Is accelerated:", glfw.get_window_param(glfw.GLFW_ACCELERATED)
         glfw.make_context_current(self.window)
         self.plotter.setupProjection()
         self.plotter.setData([0,1,2,3], [4,3,4,5])
