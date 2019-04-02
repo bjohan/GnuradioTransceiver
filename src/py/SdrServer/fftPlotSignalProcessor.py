@@ -1,7 +1,8 @@
 import signalProcessor
 import dspSignal
 #import kivyPlot as plot
-import glfwplot as plot
+#import glfwplot as plot
+import glutplot as plot
 import numpy as np
 import time
 class FftPlotSignalProcessor(signalProcessor.SignalProcessor):

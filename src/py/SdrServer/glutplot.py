@@ -28,7 +28,7 @@ class PlotWindow:
 
     def stageData(self, data):
         if self.stageLock.locked():
-            print "Dropping plot"
+            #print "Dropping plot"
             return
         with self.stageLock:
             self.staged = data
@@ -100,10 +100,10 @@ class PlotManager(threading.Thread):
 
     def idleFunc(self):
         self.makeWindow()
-        print "CW", self.currentWindow, len(self.windows),
+        #print "CW", self.currentWindow, len(self.windows),
         if self.currentWindow>=len(self.windows):
             self.currentWindow=0
-        print "CW", self.currentWindow, len(self.windows)
+        #print "CW", self.currentWindow, len(self.windows)
         glutSetWindow(self.windows[self.currentWindow].window)
         glutPostRedisplay()
         self.currentWindow+=1
@@ -117,16 +117,15 @@ class PlotManager(threading.Thread):
         #self.finalize()
         return plt
 
+pm = PlotManager()
 
-pltr = openglplot.PlotGl(400,400)
-pltr.setData([0,1,2,3], [4,3,4,5])
+def Figure(title = "Figure"):
+    return pm.newPlot(title)
 
 def main():
-    pm = PlotManager()
-    #pm.start()
     plots = []
     for i in range(5):
-        plots.append(pm.newPlot("hej%d"%(i)))
+        plots.append(Figure("hej%d"%(i)))
     ndata = 400;
     x = np.arange(ndata);
     t0 = time.time()
@@ -134,26 +133,6 @@ def main():
         for p in plots: 
             y = np.sin(x/10.0+time.time()-t0);
             p.plot(x,y)
-    #time.sleep(3)
-    #glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_MULTISAMPLE)
-    #glutInitWindowSize(400,400)
-    #glutCreateWindow("BRAPP")
-    #glutDisplayFunc(display1)
-    #glutInit(sys.argv)
-    #glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_MULTISAMPLE)
-    #glutInitWindowSize(400,400)
-    #glutCreateWindow("BRAPP")
-    #glutDisplayFunc(display1)
-    #pw = PlotWindow()
-    #glutMainLoop()
-
-def display1():
-    global rot1
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
-    pltr.setupProjection()
-    pltr.draw()
-    glutSwapBuffers()
-    #glutPostRedisplay()
 
 
 if __name__ == '__main__': 

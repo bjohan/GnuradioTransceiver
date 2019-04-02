@@ -125,23 +125,28 @@ class PlotGl():
                 self.drawLabel( "%.2e"%l, x+2 , y+2)
             
             gl.glColor4f(0,1.0,0,1.0)
-            gl.glBegin(gl.GL_LINES)
-            for i in range(len(v)/2):
-                gl.glVertex2fv(v[2*i:2*i+2])
-            gl.glEnd()
+            #gl.glBegin(gl.GL_LINES)
+
+            v = np.array(v, dtype='f')
+            self.drawLines(v, gl.GL_LINES)
+            #for i in range(len(v)/2):
+            #    gl.glVertex2fv(v[2*i:2*i+2])
+            #gl.glEnd()
 
 
-    def drawLines(self, v, i):
+    def drawLines(self, v, linetype):
         vbo = gl.GLuint(0)
         gl.glGenBuffers(1, vbo)
+        #print "sizeperelm", float(sys.getsizeof(v))/float(len(v))
         gl.glBindBuffer(gl.GL_ARRAY_BUFFER, vbo)
-        gl.glBufferData(gl.GL_ARRAY_BUFFER, sys.getsizeof(v), v, gl.GL_STREAM_DRAW)
-        gl.glBindBuffer(gl.GL_ARRAY_BUFFER, vbo)
+        #gl.glBufferData(gl.GL_ARRAY_BUFFER, sys.getsizeof(v), v, gl.GL_STREAM_DRAW)
+        gl.glBufferData(gl.GL_ARRAY_BUFFER, 4*len(v), v, gl.GL_STREAM_DRAW)
+        #gl.glBindBuffer(gl.GL_ARRAY_BUFFER, vbo)
 
         gl.glEnableClientState(gl.GL_VERTEX_ARRAY)
         gl.glVertexPointer(2, gl.GL_FLOAT, 0, ctypes.cast(0, ctypes.c_void_p))
-        gl.glBindBuffer(gl.GL_ARRAY_BUFFER, vbo)
-        gl.glDrawArrays(gl.GL_LINE_STRIP, 0, len(v))
+        #gl.glBindBuffer(gl.GL_ARRAY_BUFFER, vbo)
+        gl.glDrawArrays(linetype, 0, len(v)/2)
         gl.glDisableClientState(gl.GL_VERTEX_ARRAY)
         gl.glDeleteBuffers(1, vbo)
 
@@ -169,7 +174,7 @@ class PlotGl():
             t0 = time.time()
             gl.glColor4f(1.0,1.0,1.0,1.0)
             #gl.glBegin(gl.GL_LINE_STRIP)
-            self.drawLines(v, i)
+            self.drawLines(v, gl.GL_LINE_STRIP)
             #for i in range(len(v)/2):
             #    gl.glVertex2fv(v[2*i:2*i+2])
             #gl.glEnd()
