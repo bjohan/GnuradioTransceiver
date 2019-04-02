@@ -2,6 +2,7 @@ import OpenGL.GL as gl
 import OpenGL.GLUT as glut
 import numpy as np
 import ctypes
+import sys
 import time
 
 class TraceData():
@@ -76,9 +77,10 @@ class PlotGl():
         self.data = t
 
     def setupProjection(self):
-        width = max(1, self.width)
-        height = max(1, self.height)
-        gl.glViewport(0, 0, width, height)
+        width = int(max(1, self.width))
+        height = int(max(1, self.height))
+        #print "Projection for window", width, height
+        #gl.glViewport(0, 0, width, height)
         gl.glMatrixMode(gl.GL_PROJECTION)
         gl.glLoadIdentity()
         gl.glOrtho(0, width, 0, height, -1000, 1000)
@@ -129,9 +131,25 @@ class PlotGl():
             gl.glEnd()
 
 
+    def drawLines(self, v, i):
+        vbo = gl.GLuint(0)
+        gl.glGenBuffers(1, vbo)
+        gl.glBindBuffer(gl.GL_ARRAY_BUFFER, vbo)
+        gl.glBufferData(gl.GL_ARRAY_BUFFER, sys.getsizeof(v), v, gl.GL_STREAM_DRAW)
+        gl.glBindBuffer(gl.GL_ARRAY_BUFFER, vbo)
+
+        gl.glEnableClientState(gl.GL_VERTEX_ARRAY)
+        gl.glVertexPointer(2, gl.GL_FLOAT, 0, ctypes.cast(0, ctypes.c_void_p))
+        gl.glBindBuffer(gl.GL_ARRAY_BUFFER, vbo)
+        gl.glDrawArrays(gl.GL_LINE_STRIP, 0, len(v))
+        gl.glDisableClientState(gl.GL_VERTEX_ARRAY)
+        gl.glDeleteBuffers(1, vbo)
+
+
 
     def draw(self):
         if self.data is not None:
+            #print "Drawing", self.data.x, self.data.y
             t0 = time.time();
             self.xmin, self.xmax  = self.data.xSpan()
             self.ymin, self.ymax  = self.data.ySpan()
@@ -145,14 +163,16 @@ class PlotGl():
                 self.ys = self.height/(self.ymax-self.ymin)
             #print self.width, self.height
 
-            t0 = time.time()
             v, i = self.generateMeshAndIndices()
+            v = np.array(v, dtype='f')
             self.drawGraticule()
+            t0 = time.time()
             gl.glColor4f(1.0,1.0,1.0,1.0)
-            gl.glBegin(gl.GL_LINE_STRIP)
-            for i in range(len(v)/2):
-                gl.glVertex2fv(v[2*i:2*i+2])
-            gl.glEnd()
+            #gl.glBegin(gl.GL_LINE_STRIP)
+            self.drawLines(v, i)
+            #for i in range(len(v)/2):
+            #    gl.glVertex2fv(v[2*i:2*i+2])
+            #gl.glEnd()
             fps = 1.0/(time.time()-t0)
             self.drawLabel("FPS %0.2f"%(fps), self.width-100,self.height-20)
             #print "gl trace", time.time()-t0

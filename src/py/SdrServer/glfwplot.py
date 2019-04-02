@@ -21,8 +21,13 @@ class PlotWindow:
         self.plotter.setData([0,1,2,3], [4,3,4,5])
         glfw.set_window_size_callback(self.window, self.resize_cb)
         glfw.set_window_refresh_callback(self.window, self.refresh_cb)
-      
+     
+    def isReady(self):
+        return not self.stageLock.locked()
+
     def stageData(self, data):
+        if self.stageLock.locked():
+            return
         with self.stageLock:
             self.staged = data
         glfw.post_empty_event()

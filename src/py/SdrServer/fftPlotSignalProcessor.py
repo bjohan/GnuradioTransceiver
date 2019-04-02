@@ -14,6 +14,11 @@ class FftPlotSignalProcessor(signalProcessor.SignalProcessor):
         self.fig.close()
 
     def process(self, signalIn):
+        signalOut = signalIn
+
+        if not self.fig.isReady():
+            return signalOut
+
         if self.nmax is None:
             nsamp = len(signalIn.samples)
         else:

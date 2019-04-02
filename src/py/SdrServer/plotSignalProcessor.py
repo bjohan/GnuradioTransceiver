@@ -13,7 +13,10 @@ class PlotSignalProcessor(signalProcessor.SignalProcessor):
         self.fig.close()
 
     def process(self, signalIn):
-        signalOut = dspSignal.Signal(baseSig = signalIn)
+        signalOut = signalIn
+        if not self.fig.isReady():
+            return signalOut
+        #signalOut = dspSignal.Signal(baseSig = signalIn)
         x = np.arange(len(signalIn.samples))/signalIn.rate
         self.fig.plot(x, np.real(signalIn.samples))
         return signalOut
