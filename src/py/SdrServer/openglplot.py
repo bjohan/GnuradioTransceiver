@@ -161,12 +161,13 @@ class PlotGl():
             if self.xmax == self.xmin:
                 self.xs = 1.0
             else:
-                self.xs = self.width/(self.xmax-self.xmin)
+                self.xs = self.width/float(self.xmax-self.xmin)
             if self.ymax == self.ymin:
                 self.ys = 1.0
             else:
-                self.ys = self.height/(self.ymax-self.ymin)
+                self.ys = self.height/float(self.ymax-self.ymin)
             #print self.width, self.height
+            #print self.xmin, self.xmax, self.ymin, self.ymax, self.xs, self.ys
 
             v, i = self.generateMeshAndIndices()
             v = np.array(v, dtype='f')
@@ -178,8 +179,9 @@ class PlotGl():
             #for i in range(len(v)/2):
             #    gl.glVertex2fv(v[2*i:2*i+2])
             #gl.glEnd()
-            fps = 1.0/(time.time()-t0)
-            self.drawLabel("FPS %0.2f"%(fps), self.width-100,self.height-20)
+            rt = (time.time()-t0)
+            self.drawLabel("RT %0.2fus"%(rt*1e6), self.width-100,self.height-20)
+            print "RT %d us"%(rt*1e6)
             #print "gl trace", time.time()-t0
 
 

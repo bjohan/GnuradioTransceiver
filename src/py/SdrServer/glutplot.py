@@ -15,7 +15,7 @@ class PlotWindow:
     def __init__(self, w = 400, h=400, title="Plot", parent = None):
         self.stageLock = threading.Lock()
         self.staged = None
-        glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH )
+        glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_MULTISAMPLE)
         glutInitWindowSize(400,400)
         self.window = glutCreateWindow(title)
         self.plotter = openglplot.PlotGl(w,h)
@@ -126,13 +126,14 @@ def main():
     plots = []
     for i in range(5):
         plots.append(Figure("hej%d"%(i)))
-    ndata = 400;
+    ndata = 2*8000;
     x = np.arange(ndata);
     t0 = time.time()
     while True:
         for p in plots: 
-            y = np.sin(x/10.0+time.time()-t0);
+            y = np.sin(x/1000.0+time.time()-t0);
             p.plot(x,y)
+        time.sleep(0.01)
 
 
 if __name__ == '__main__': 
