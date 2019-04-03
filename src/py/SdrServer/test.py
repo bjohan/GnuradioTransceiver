@@ -60,7 +60,7 @@ plotfm = plotSignalProcessor.PlotSignalProcessor("decimated td");
 plotfft = fftPlotSignalProcessor.FftPlotSignalProcessor("Decimated spectrum", nmax = 512)
 plotfftfull = fftPlotSignalProcessor.FftPlotSignalProcessor("full spectrum", nmax = 512)
 plotfftfir = fftPlotSignalProcessor.FftPlotSignalProcessor("firfiltered full spectrum", nmax=512)
-squelch = squelchSignalProcessor.SquelchSignalProcessor(threshold = 0.1, hold = 0.00000)
+squelch = squelchSignalProcessor.SquelchSignalProcessor(threshold = 0.4, hold = 0.00000)
 
 statdsp = statusSignalProcessor.StatusSignalProcessor()
 tunedsp = tuneSignalProcessor.TuneSignalProcessor(nco=-1500)

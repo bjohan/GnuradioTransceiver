@@ -181,7 +181,7 @@ class PlotGl():
             #gl.glEnd()
             rt = (time.time()-t0)
             self.drawLabel("RT %0.2fus"%(rt*1e6), self.width-100,self.height-20)
-            print "RT %d us"%(rt*1e6)
+            #print "RT %d us"%(rt*1e6)
             #print "gl trace", time.time()-t0
 
 
