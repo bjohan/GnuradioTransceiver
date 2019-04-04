@@ -15,11 +15,15 @@ class PlotWindow:
     def __init__(self, w = 400, h=400, title="Plot", parent = None):
         self.stageLock = threading.Lock()
         self.staged = None
+        self.parent = parent
         glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_MULTISAMPLE)
         glutInitWindowSize(400,400)
+        self.title=title
         self.window = glutCreateWindow(title)
         self.plotter = openglplot.PlotGl(w,h)
         glutDisplayFunc(self.display)
+        glutCloseFunc(self.close)
+        self.active = True
         self.plotter.setupProjection()
         self.plotter.setData([0,1,2,3], [4,3,4,5])
      
@@ -34,7 +38,8 @@ class PlotWindow:
             self.staged = data
 
     def plot(self, x = None, y = None):
-        self.stageData((x,y))
+        if self.active:
+            self.stageData((x,y))
 
     def draw(self):
         self.plotter.draw()
@@ -59,7 +64,9 @@ class PlotWindow:
         #glutPostRedisplay()
 
     def close(self):
-        self.parent.close(self)
+        print "closing", self.title
+        self.active = False
+        self.parent.removePlot(self)
 
 
 class PlotManager(threading.Thread):
@@ -95,8 +102,11 @@ class PlotManager(threading.Thread):
         if not self.cmdQ.empty():
             cmd = self.cmdQ.get()
             if cmd[0] == 'create':
-                self.windows.append(PlotWindow(title=cmd[1]))
+                self.windows.append(PlotWindow(title=cmd[1], parent = self))
                 self.plotQ.put(self.windows[-1])
+            if cmd[0] == 'remove':
+                self.windows.remove(cmd[1])
+
 
     def idleFunc(self):
         self.makeWindow()
@@ -104,9 +114,16 @@ class PlotManager(threading.Thread):
         if self.currentWindow>=len(self.windows):
             self.currentWindow=0
         #print "CW", self.currentWindow, len(self.windows)
-        glutSetWindow(self.windows[self.currentWindow].window)
-        glutPostRedisplay()
-        self.currentWindow+=1
+        if len(self.windows)>0:
+            glutSetWindow(self.windows[self.currentWindow].window)
+            glutPostRedisplay()
+            self.currentWindow+=1
+        else:
+            glutLeaveMainLoop()
+
+    def removePlot(self, target):
+        self.cmdQ.put(('remove', target))
+
 
     def newPlot(self, title):
         self.cmdQ.put(('create', title))
