@@ -69,6 +69,7 @@ class PlotGl():
         self.width = w
         self.height = h
         self.color = (0,1,0)
+        self.autoScale = True
 
     def setData(self, x, y):
         self.data = TraceData(x=x, y=y)
@@ -152,10 +153,8 @@ class PlotGl():
 
 
 
-    def draw(self):
-        if self.data is not None:
-            #print "Drawing", self.data.x, self.data.y
-            t0 = time.time();
+    def computeScale(self):
+        if self.autoScale:
             self.xmin, self.xmax  = self.data.xSpan()
             self.ymin, self.ymax  = self.data.ySpan()
             if self.xmax == self.xmin:
@@ -166,6 +165,13 @@ class PlotGl():
                 self.ys = 1.0
             else:
                 self.ys = self.height/float(self.ymax-self.ymin)
+
+
+    def draw(self):
+        if self.data is not None:
+            #print "Drawing", self.data.x, self.data.y
+            t0 = time.time();
+            self.computeScale()
             #print self.width, self.height
             #print self.xmin, self.xmax, self.ymin, self.ymax, self.xs, self.ys
 

@@ -53,7 +53,10 @@ class SoundDevice(threading.Thread):
 
 
     def run(self):
-        with(sd.Stream(channels=2, callback=self.callback)):
+        stream = sd.Stream(channels=2, callback=self.callback, latency=0.025)
+        print "latency", stream.latency
+        with stream:
+            print dir(stream)
             self.lock.acquire()
 
     def getSamples(self, n=None):

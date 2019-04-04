@@ -47,7 +47,7 @@ sndDev  = soundDevice.SoundDevice()
 
 print "Setting up processors"
 sdrsrc = sdrSourceProcessor.SdrSourceProcessor(sdr, samples = 32768, fc = sdr.getFrequency()['rx'], rate = sdr.getSampleRate()['rx'])
-firdsp = firSignalProcessor.FirSignalProcessor(taps = 31, passBand=0.1);
+firdsp = firSignalProcessor.FirSignalProcessor(taps = 64, passBand=0.1);
 fmdsp = fmDemodSignalProcessor.FmDemodSignalProcessor()
 agcdsp = agcSignalProcessor.AgcSignalProcessor(target=1, maxAmp = 10, rate =0.01)
 fftdsp = fftSignalProcessor.FftSignalProcessor(samples=4096)

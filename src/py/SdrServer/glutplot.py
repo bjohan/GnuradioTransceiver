@@ -23,6 +23,8 @@ class PlotWindow:
         self.plotter = openglplot.PlotGl(w,h)
         glutDisplayFunc(self.display)
         glutCloseFunc(self.close)
+        glutKeyboardFunc(self.keyboardFunc)
+        self.paused = False
         self.active = True
         self.plotter.setupProjection()
         self.plotter.setData([0,1,2,3], [4,3,4,5])
@@ -48,12 +50,21 @@ class PlotWindow:
         doUpdate = False
         with self.stageLock:
             if self.staged is not None:
-                self.plotter.setData(self.staged[0], self.staged[1])
-                doUpdate = True
-                self.staged = None
+                if not self.paused:
+                    self.plotter.setData(self.staged[0], self.staged[1])
+                    doUpdate = True
+                    self.staged = None
         #if doUpdate:
         #    self.update()
     
+    def keyboardFunc(self, char, x,y):
+        print self.title, char, x, y
+        if char == 'p':
+            self.paused = not self.paused
+
+        if char == 's':
+            self.plotter.autoScale = not self.plotter.autoScale
+
     def display(self):
         self.presentData()
         glClearColor(0.0,0.0,0.0,1.0)
@@ -106,6 +117,7 @@ class PlotManager(threading.Thread):
                 self.plotQ.put(self.windows[-1])
             if cmd[0] == 'remove':
                 self.windows.remove(cmd[1])
+
 
 
     def idleFunc(self):
