@@ -147,6 +147,9 @@ class SoapySdrDevice(sdrDevice.SdrDeviceBase):
         #print buff
         return buff
 
+    def getSamples(self, n):
+        return self.getRxSamples(n)
+
 #tx
     def hasTxStream(self):
         return self.txStream is not None
@@ -185,6 +188,9 @@ class SoapySdrDevice(sdrDevice.SdrDeviceBase):
             return []
         #print sr
         return sr
+
+    def putSamples(self, samples):
+        return self.putTxSamples(samples)
 
     def getItems(self):
         d = {}

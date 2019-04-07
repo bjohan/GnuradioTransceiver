@@ -1,23 +1,23 @@
 import numpy as np
 import dspPipe
 import soapySdrDevice
-import sdrSourceProcessor
-import fftSignalProcessor
-import firSignalProcessor
-import plotSignalProcessor
-import dbSignalProcessor
-import limitSignalProcessor
-import decimationSignalProcessor
-import agcSignalProcessor
-import fmDemodSignalProcessor
-import soundSinkProcessor
+import dsp.source
+import dsp.fft
+import dsp.fir
+import dsp.plot
+import dsp.db
+import dsp.limiter
+import dsp.decimate
+import dsp.agc
+import dsp.fmDemod
+import dsp.sink
 import dspPipeLine
 import time
 import soundDevice
-import fftPlotSignalProcessor
-import statusSignalProcessor
-import tuneSignalProcessor
-import squelchSignalProcessor
+import dsp.fftPlot
+import dsp.status
+import dsp.tuner
+import dsp.squelch
 
 
 d = soapySdrDevice.SoapySdrManager()
@@ -46,24 +46,24 @@ print "Creating sound device"
 sndDev  = soundDevice.SoundDevice()
 
 print "Setting up processors"
-sdrsrc = sdrSourceProcessor.SdrSourceProcessor(sdr, samples = 32768, fc = sdr.getFrequency()['rx'], rate = sdr.getSampleRate()['rx'])
-firdsp = firSignalProcessor.FirSignalProcessor(taps = 64, passBand=0.1);
-fmdsp = fmDemodSignalProcessor.FmDemodSignalProcessor()
-agcdsp = agcSignalProcessor.AgcSignalProcessor(target=1, maxAmp = 10, rate =0.01)
-fftdsp = fftSignalProcessor.FftSignalProcessor(samples=4096)
-dbdsp = dbSignalProcessor.DbSignalProcessor()
-decdsp = decimationSignalProcessor.DecimationSignalProcessor(factor=91)
-limitdsp = limitSignalProcessor.LimitSignalProcessor(mi=-1, ma = 1)
-sndsink = soundSinkProcessor.SoundSinkProcessor(sndDev);
-plotdsp = plotSignalProcessor.PlotSignalProcessor("Demodulated fm");
-plotfm = plotSignalProcessor.PlotSignalProcessor("decimated td");
-plotfft = fftPlotSignalProcessor.FftPlotSignalProcessor("Decimated spectrum", nmax = 512)
-plotfftfull = fftPlotSignalProcessor.FftPlotSignalProcessor("full spectrum", nmax = 512)
-plotfftfir = fftPlotSignalProcessor.FftPlotSignalProcessor("firfiltered full spectrum", nmax=512)
-squelch = squelchSignalProcessor.SquelchSignalProcessor(threshold = 0.4, hold = 0.00000)
+sdrsrc = dsp.source.Source(sdr, samples = 32768, fc = sdr.getFrequency()['rx'], rate = sdr.getSampleRate()['rx'])
+firdsp = dsp.fir.Fir(taps = 64, passBand=0.1);
+fmdsp = dsp.fmDemod.FmDemod()
+agcdsp = dsp.agc.Agc(target=1, maxAmp = 10, rate =0.01)
+fftdsp = dsp.fft.Fft(samples=4096)
+dbdsp = dsp.db.Db()
+decdsp = dsp.decimate.Decimate(factor=91)
+limitdsp = dsp.limiter.Limiter(mi=-1, ma = 1)
+sndsink = dsp.sink.Sink(sndDev);
+plotdsp = dsp.plot.Plot("Demodulated fm");
+plotfm = dsp.plot.Plot("decimated td");
+plotfft = dsp.fftPlot.FftPlot("Decimated spectrum", nmax = 512)
+plotfftfull = dsp.fftPlot.FftPlot("full spectrum", nmax = 512)
+plotfftfir = dsp.fftPlot.FftPlot("firfiltered full spectrum", nmax=512)
+squelch = dsp.squelch.Squelch(threshold = 0.4, hold = 0.00000)
 
-statdsp = statusSignalProcessor.StatusSignalProcessor()
-tunedsp = tuneSignalProcessor.TuneSignalProcessor(nco=-1500)
+statdsp = dsp.status.Status()
+tunedsp = dsp.tuner.Tuner(nco=-1500)
 dsp = dspPipeLine.DspPipeLine([ [sdrsrc], [plotfftfull], [firdsp],[plotfftfir], [decdsp],[tunedsp], [plotfft], [plotfm], [squelch], [fmdsp],[plotdsp], [agcdsp],[sndsink], [statdsp]])# [agcdsp], [sndsink], [fftdsp], [dbdsp, limitdsp], [plotdsp]])
 
 print "starting pipeline"

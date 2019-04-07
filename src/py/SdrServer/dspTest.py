@@ -3,14 +3,7 @@ import dspPipe
 import soapySdrDevice
 import dspPipeLine
 import soundDevice
-#import plotSignalProcessor
-#import fftPlotSignalProcessor
-#import statusSignalProcessor
-#import soundSourceProcessor
-#import soundSinkProcessor
-#import resamplingSignalProcessor
 import time
-#import dspSignal
 import dsp.source
 import dsp.plot
 import dsp.fftPlot

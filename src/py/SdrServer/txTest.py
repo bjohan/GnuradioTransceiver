@@ -1,13 +1,15 @@
 import numpy as np
 import dspPipe
 import soapySdrDevice
-import plotSignalProcessor
 import dspPipeLine
 import soundDevice
-import fftPlotSignalProcessor
-import statusSignalProcessor
-import soundSourceProcessor
-import soundSinkProcessor
+import dsp.source
+import dsp.sink
+import dsp.plot
+import dsp.fftPlot
+import dsp.status
+import dsp.resample
+import dsp.printer
 import time
 
 
@@ -35,13 +37,13 @@ print "Creating sound device"
 sndDev  = soundDevice.SoundDevice()
 
 print "Setting up processors"
-sndsrc = soundSourceProcessor.SoundSourceProcessor(sndDev, 1024*2);
-sndsink = soundSinkProcessor.SoundSinkProcessor(sndDev);
-plotdsp = plotSignalProcessor.PlotSignalProcessor("AF time");
-plotfft = fftPlotSignalProcessor.FftPlotSignalProcessor("AF freq")
-statdsp = statusSignalProcessor.StatusSignalProcessor()
+sndsrc = dsp.source.Source(sndDev, samples=1024*2, fc = 0, rate = 44000);
+sndsink = dsp.sink.Sink(sndDev);
+printer = dsp.printer.Printer()
+plotdsp = dsp.plot.Plot("AF time");
+plotfft = dsp.fftPlot.FftPlot("AF freq")
+statdsp = dsp.status.Status()
 dsp = dspPipeLine.DspPipeLine([ [sndsrc], [plotdsp], [plotfft], [sndsink], [statdsp]])
-
 print "starting pipeline"
 dsp.start()
 try:

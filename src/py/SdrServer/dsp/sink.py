@@ -2,7 +2,7 @@ import signalProcessor
 import numpy as np
 import scipy.signal
 import time
-class SoundSinkProcessor(signalProcessor.SignalProcessor):
+class Sink(signalProcessor.SignalProcessor):
     def __init__(self, sndDev):
         signalProcessor.SignalProcessor.__init__(self, "audio")
         self.dev = sndDev

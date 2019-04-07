@@ -18,6 +18,11 @@ class DspPipe(threading.Thread):
         self.computeTime = 0
         self.done = False
         self.starv = False
+        self.n = 0
+
+    def start(self, n=None):
+        self.n=n
+        threading.Thread.start(self)
 
     
     def putSamples(self, samples):
@@ -52,6 +57,9 @@ class DspPipe(threading.Thread):
                     for o in self.out:
                         o.putSamples(so)
                 self.computed+=1
+                if self.n is not None:
+                    if self.computed >= self.n:
+                        break
                 self.computeTime += time.time()-t0
                 so = None
                 si = None

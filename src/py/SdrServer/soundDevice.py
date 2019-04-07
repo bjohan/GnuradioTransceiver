@@ -59,21 +59,29 @@ class SoundDevice(threading.Thread):
             print dir(stream)
             self.lock.acquire()
 
-    def getSamples(self, n=None):
+    def getSamplesInternal(self, n=None):
         self.il.acquire()
         if n is not None:
             if n > len(self.ibuf):
                 self.il.release()
-                return []
+                return np.array([])
             dr = self.ibuf[0:n]
             self.ibuf = self.ibuf[n:]
             self.il.release()
-            return dr
+            return dr[:,0]
         else:
             dr = self.ibuf
             self.ibuf = []
             self.il.release()
-            return dr;
+            return dr[:,0];
+
+    def getSamples(self, n):
+        while True:
+            s = self.getSamplesInternal(n)
+            if len(s) == 0:
+                time.sleep(0.0001)
+            else:
+                return s
 
     def putSamples(self, samples):
         self.ol.acquire()

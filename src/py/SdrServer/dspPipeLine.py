@@ -7,9 +7,9 @@ class DspPipeLine:
             self.pipes.insert(0, dspPipe.DspPipe(proc=p, out = lp))
             lp = [self.pipes[0]]
 
-    def start(self):
+    def start(self, n = None):
         for p in reversed(self.pipes):
-            p.start()
+            p.start(n)
 
     def stop(self):
         for p in self.pipes:
