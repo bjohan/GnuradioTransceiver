@@ -15,7 +15,7 @@ class SoundSourceProcessor(signalProcessor.SignalProcessor):
             samples = self.sndDev.getSamples(self.samples)
             time.sleep(0.001)
         #print samples
-        #print "samples shape", samples.shape
-        samples = samples[:,1]
+        if len(samples.shape) > 1:
+            samples = samples[:,1]
         return dspSignal.Signal(samples=samples, domain='time', fc=0, rate = 44000, shift = 0)
 

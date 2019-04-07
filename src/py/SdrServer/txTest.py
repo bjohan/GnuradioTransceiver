@@ -35,12 +35,11 @@ print "Creating sound device"
 sndDev  = soundDevice.SoundDevice()
 
 print "Setting up processors"
-sndsrc = soundSourceProcessor.SoundSourceProcessor(sndDev, 1024);
+sndsrc = soundSourceProcessor.SoundSourceProcessor(sndDev, 1024*2);
 sndsink = soundSinkProcessor.SoundSinkProcessor(sndDev);
 plotdsp = plotSignalProcessor.PlotSignalProcessor("AF time");
 plotfft = fftPlotSignalProcessor.FftPlotSignalProcessor("AF freq")
 statdsp = statusSignalProcessor.StatusSignalProcessor()
-
 dsp = dspPipeLine.DspPipeLine([ [sndsrc], [plotdsp], [plotfft], [sndsink], [statdsp]])
 
 print "starting pipeline"
