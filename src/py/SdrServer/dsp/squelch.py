@@ -1,7 +1,7 @@
 import signalProcessor
 import dspSignal
 import numpy as np
-class SquelchSignalProcessor(signalProcessor.SignalProcessor):
+class Squelch(signalProcessor.SignalProcessor):
     def __init__(self, threshold=200, hold=0.5):
         signalProcessor.SignalProcessor.__init__(self, "squelch")
         self.threshold = threshold

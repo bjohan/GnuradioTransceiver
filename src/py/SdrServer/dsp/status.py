@@ -1,6 +1,6 @@
 import signalProcessor
 import time
-class StatusSignalProcessor(signalProcessor.SignalProcessor):
+class Status(signalProcessor.SignalProcessor):
     def __init__(self, rate = 1.0):
         signalProcessor.SignalProcessor.__init__(self, "Status")
         self.rate = rate
@@ -14,7 +14,7 @@ class StatusSignalProcessor(signalProcessor.SignalProcessor):
         self.samples+=len(signalIn.samples)
         if time.time() > self.nt:
             elapsed = time.time()-self.lt
-            print "latency", time.time()-signalIn.t0, "fps", float(self.frames)/elapsed, "sps", float(self.samples)/elapsed
+            print "latency", time.time()-signalIn.t0, "fps", float(self.frames)/elapsed, "sps %e"%(float(self.samples)/elapsed)
             self.samples = 0
             self.frames = 0
             self.nt = time.time()+self.rate;

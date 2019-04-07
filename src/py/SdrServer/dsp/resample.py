@@ -1,8 +1,8 @@
 import dspSignal
 import signalProcessor
 import numpy as np
-import scipy
-class ResamplingSignalProcessor(signalProcessor.SignalProcessor):
+import scipy.interpolate
+class Resample(signalProcessor.SignalProcessor):
     def __init__(self, outputRate):
         signalProcessor.SignalProcessor.__init__(self, "resampling")
         self.outputRate =  float(outputRate)

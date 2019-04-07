@@ -1,7 +1,7 @@
 import signalProcessor
 import dspSignal
 import numpy as np
-class TuneSignalProcessor(signalProcessor.SignalProcessor):
+class Tuner(signalProcessor.SignalProcessor):
     def __init__(self, nco=0.0):
         signalProcessor.SignalProcessor.__init__(self, "tune")
         self.nco = float(nco)

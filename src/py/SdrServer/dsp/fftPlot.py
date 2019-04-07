@@ -5,7 +5,7 @@ import dspSignal
 import glutplot as plot
 import numpy as np
 import time
-class FftPlotSignalProcessor(signalProcessor.SignalProcessor):
+class FftPlot(signalProcessor.SignalProcessor):
     def __init__(self, title = "Plot", nmax=None):
         signalProcessor.SignalProcessor.__init__(self, "fftplot")
         self.fig = plot.Figure(title)

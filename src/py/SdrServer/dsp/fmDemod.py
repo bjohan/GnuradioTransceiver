@@ -1,7 +1,7 @@
 import signalProcessor
 import dspSignal
 import numpy as np
-class FmDemodSignalProcessor(signalProcessor.SignalProcessor):
+class FmDemod(signalProcessor.SignalProcessor):
     def __init__(self):
         signalProcessor.SignalProcessor.__init__(self, "fmdemod")
 

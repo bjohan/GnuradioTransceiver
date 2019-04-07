@@ -1,7 +1,7 @@
 import dspSignal
 import signalProcessor
 import numpy as np
-class DecimationSignalProcessor(signalProcessor.SignalProcessor):
+class Decimate(signalProcessor.SignalProcessor):
     def __init__(self, factor=10):
         signalProcessor.SignalProcessor.__init__(self, "decimation")
         self.factor = int(factor)

@@ -1,7 +1,7 @@
 import signal
 import signalProcessor
 import numpy as np
-class FftSignalProcessor(signalProcessor.SignalProcessor):
+class Fft(signalProcessor.SignalProcessor):
     def __init__(self, samples=1024):
         signalProcessor.SignalProcessor.__init__(self, "FFT")
         self.samples = samples

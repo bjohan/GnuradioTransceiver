@@ -1,6 +1,6 @@
 import signalProcessor
 import numpy as np
-class AgcSignalProcessor(signalProcessor.SignalProcessor):
+class Agc(signalProcessor.SignalProcessor):
     def __init__(self, rate = 0.01, target = 1.0, maxAmp = 2.0, overrangeNum = 10):
         signalProcessor.SignalProcessor.__init__(self, "agc")
         self.rate = rate
