@@ -13,6 +13,7 @@ import dsp.printer
 import dsp.fir
 import dsp.fmMod
 import dsp.agc
+import dsp.squelch
 import time
 
 
@@ -55,9 +56,10 @@ sndDev  = soundDevice.SoundDevice()
 
 print "Setting up processors"
 sndsrc = dsp.source.Source(sndDev, samples=512/2, fc = 0, rate = 44000);
+squelch = dsp.squelch.Squelch(threshold=0.8)
 agcproc = dsp.agc.Agc(rate = 0.01*5)
 fir = dsp.fir.Fir(taps = 128, passBand = 0.1, transition = 0.01)
-fmmod = dsp.fmMod.FmMod(2000)
+fmmod = dsp.fmMod.FmMod(10000)
 plotdsp = dsp.plot.Plot("AF time");
 plotfft = dsp.fftPlot.FftPlot("AF freq", nmax = 2048)
 plotfm = dsp.plot.Plot("FM time");
@@ -67,7 +69,7 @@ rfplotfft = dsp.fftPlot.FftPlot("RF freq",nmax=2048)
 resamp = dsp.resample.Resample(outputRate = 4e6)
 sink = dsp.sink.Sink(sdr)
 statdsp = dsp.status.Status()
-dsp = dspPipeLine.DspPipeLine([ [sndsrc], [agcproc],[plotdsp], [plotfft], [fmmod] , [plotfm], [plotfftfm], [resamp], [rfplotdsp], [rfplotfft], [sink], [statdsp]])
+dsp = dspPipeLine.DspPipeLine([ [sndsrc], [squelch],[plotdsp], [plotfft], [fmmod] , [plotfm], [plotfftfm], [resamp], [rfplotdsp], [rfplotfft], [sink], [statdsp]])
 #dsp = dspPipeLine.DspPipeLine([ [sndsrc],[resamp],[sink]])
 print "starting pipeline"
 dsp.start()
