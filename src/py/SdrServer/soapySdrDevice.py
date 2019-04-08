@@ -190,7 +190,7 @@ class SoapySdrDevice(sdrDevice.SdrDeviceBase):
         return sr
 
     def putSamples(self, samples):
-        return self.putTxSamples(samples)
+        return self.putTxSamples(np.array(samples, dtype='complex64'))
 
     def getItems(self):
         d = {}
