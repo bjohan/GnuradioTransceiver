@@ -21,7 +21,7 @@ class SineSource:
     def __init__(self):
         self.tlast = 0.0
         self.rate = 44000.0
-        self.freq = 440.0
+        self.freq = 440.0#self.rate/512
         self.amplitude = 1
         pass
 
@@ -55,12 +55,13 @@ print "Creating sound device"
 sndDev  = soundDevice.SoundDevice()
 
 print "Setting up processors"
-sndsrc = dsp.source.Source(sndDev, samples=512/2, fc = 0, rate = 44000);
-squelch = dsp.squelch.Squelch(threshold=0.8)
+sndsrc = dsp.source.Source(sndDev, samples=512, fc = 0, rate = 44000);
+squelch = dsp.squelch.Squelch(threshold=0.2, hold = 0.2)
 agcproc = dsp.agc.Agc(rate = 0.01*5)
 fir = dsp.fir.Fir(taps = 128, passBand = 0.1, transition = 0.01)
-fmmod = dsp.fmMod.FmMod(10000)
+fmmod = dsp.fmMod.FmMod(6000)
 plotdsp = dsp.plot.Plot("AF time");
+plotfilt = dsp.plot.Plot("Filtered");
 plotfft = dsp.fftPlot.FftPlot("AF freq", nmax = 2048)
 plotfm = dsp.plot.Plot("FM time");
 plotfftfm = dsp.fftPlot.FftPlot("FM freq", nmax = 2048)
@@ -69,7 +70,7 @@ rfplotfft = dsp.fftPlot.FftPlot("RF freq",nmax=2048)
 resamp = dsp.resample.Resample(outputRate = 4e6)
 sink = dsp.sink.Sink(sdr)
 statdsp = dsp.status.Status()
-dsp = dspPipeLine.DspPipeLine([ [sndsrc], [squelch],[plotdsp], [plotfft], [fmmod] , [plotfm], [plotfftfm], [resamp], [rfplotdsp], [rfplotfft], [sink], [statdsp]])
+dsp = dspPipeLine.DspPipeLine([ [sndsrc],[plotdsp],[plotfft], [fir],[plotfilt],[squelch], [fmmod] , [plotfm], [plotfftfm], [resamp], [rfplotdsp], [rfplotfft], [sink], [statdsp]])
 #dsp = dspPipeLine.DspPipeLine([ [sndsrc],[resamp],[sink]])
 print "starting pipeline"
 dsp.start()

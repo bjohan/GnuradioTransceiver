@@ -15,6 +15,6 @@ class FmMod(signalProcessor.SignalProcessor):
         #print cp
         #signalOut.samples = signalIn.samples*np.exp(-1.0j*np.pi*2.0*t)
         signalOut.samples =  np.exp(1.0j*cp)
-        self.plast = cp[-1]%np.pi
+        self.plast = cp[-1]%(2.0*np.pi)
         return signalOut
 

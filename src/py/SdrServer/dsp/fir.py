@@ -10,7 +10,7 @@ class Fir(signalProcessor.SignalProcessor):
 
     def processSimple(self, signalIn):
         #return scipy.signal.convolve(signalIn, self.taps, mode='valid')
-        toFilt = np.hstack((signalIn, self.last))
+        toFilt = np.hstack((self.last, signalIn))
         self.last = signalIn[-self.ntaps:]
-        return np.convolve(signalIn, self.taps, mode='valid')
+        return np.convolve(toFilt, self.taps, mode='valid')
 
