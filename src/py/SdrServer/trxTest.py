@@ -51,13 +51,13 @@ txsquelch = dsp.squelch.Squelch(threshold=0.2, hold = 0.2)
 txagcproc = dsp.agc.Agc(rate = 0.01*5)
 txfir = dsp.fir.Fir(taps = 128, passBand = 0.1, transition = 0.01)
 txfmmod = dsp.fmMod.FmMod(6000)
-txplotdsp = dsp.plot.Plot("AF time");
-txplotfilt = dsp.plot.Plot("Filtered");
-txplotfft = dsp.fftPlot.FftPlot("AF freq", nmax = 2048)
-txplotfm = dsp.plot.Plot("FM time");
-txplotfftfm = dsp.fftPlot.FftPlot("FM freq", nmax = 2048)
-txrfplotdsp = dsp.plot.Plot("RF time");
-txrfplotfft = dsp.fftPlot.FftPlot("RF freq",nmax=2048)
+txplotdsp = dsp.plot.Plot("TX AF time");
+txplotfilt = dsp.plot.Plot("TX Filtered");
+txplotfft = dsp.fftPlot.FftPlot("TX AF freq", nmax = 2048)
+txplotfm = dsp.plot.Plot("TX FM time");
+txplotfftfm = dsp.fftPlot.FftPlot("TX FM freq", nmax = 2048)
+txrfplotdsp = dsp.plot.Plot("TX RF time");
+txrfplotfft = dsp.fftPlot.FftPlot("TX RF freq",nmax=2048)
 txresamp = dsp.resample.Resample(outputRate = 4e6)
 txsink = dsp.sink.Sink(sdr)
 txstatdsp = dsp.status.Status()
@@ -73,11 +73,11 @@ rxdbdsp = dsp.db.Db()
 rxdecdsp = dsp.resample.Resample(outputRate=44000)
 rxlimitdsp = dsp.limiter.Limiter(mi=-1, ma = 1)
 rxsndsink = dsp.sink.Sink(sndDev);
-rxplotdsp = dsp.plot.Plot("Demodulated fm");
-rxplotfm = dsp.plot.Plot("decimated td");
-rxplotfft = dsp.fftPlot.FftPlot("Decimated spectrum", nmax = 512)
-rxplotfftfull = dsp.fftPlot.FftPlot("full spectrum", nmax = 512)
-rxplotfftfir = dsp.fftPlot.FftPlot("firfiltered full spectrum", nmax=512)
+rxplotdsp = dsp.plot.Plot("RX Demodulated fm");
+rxplotfm = dsp.plot.Plot("RX decimated td");
+rxplotfft = dsp.fftPlot.FftPlot("RX Decimated spectrum", nmax = 512)
+rxplotfftfull = dsp.fftPlot.FftPlot("RX full spectrum", nmax = 512)
+rxplotfftfir = dsp.fftPlot.FftPlot("RX firfiltered full spectrum", nmax=512)
 rxsquelch = dsp.squelch.Squelch(threshold = 0.01, hold = 0.00000)
 rxac = dsp.acCouple.AcCouple()
 rxac2 = dsp.acCouple.AcCouple()
