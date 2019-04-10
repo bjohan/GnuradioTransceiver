@@ -21,6 +21,9 @@ import dsp.squelch
 import dsp.acCouple
 
 
+
+
+
 d = soapySdrDevice.SoapySdrManager()
 
 #list all sdr devices
@@ -37,7 +40,9 @@ else:
     print "No hackrf found. Exiting"
     exit(-1)
         
-        
+
+
+
 sdr.setSampleRate(4e6)
 print "Sample rates", sdr.getSampleRate()
 sdr.setFrequency(145.00e6)
@@ -66,8 +71,8 @@ ac = dsp.acCouple.AcCouple()
 ac2 = dsp.acCouple.AcCouple()
 
 statdsp = dsp.status.Status()
-tunedsp = dsp.tuner.Tuner(nco=-1500)
-dsp = dspPipeLine.DspPipeLine([ [sdrsrc], [ac], [plotfftfull], [firdsp],[plotfftfir], [decdsp],[tunedsp], [plotfft], [plotfm], [squelch], [fmdsp],[ac2], [plotdsp], [agcdsp],[sndsink], [statdsp]])# [agcdsp], [sndsink], [fftdsp], [dbdsp, limitdsp], [plotdsp]])
+tunedsp = dsp.tuner.Tuner(nco=-150000)
+dsp = dspPipeLine.DspPipeLine([ [sdrsrc], [tunedsp],[ac], [plotfftfull], [firdsp],[plotfftfir], [decdsp], [plotfft], [plotfm], [squelch], [fmdsp],[ac2], [plotdsp], [agcdsp],[sndsink], [statdsp]])# [agcdsp], [sndsink], [fftdsp], [dbdsp, limitdsp], [plotdsp]])
 
 print "starting pipeline"
 dsp.start()

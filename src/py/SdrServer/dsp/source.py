@@ -18,6 +18,8 @@ class Source(signalProcessor.SignalProcessor):
         #tIdle = time.time()-self.tlast
         #t0 = time.time()
         samples = self.sdr.getSamples(self.samples)
+        if samples is None:
+            return None
         return dspSignal.Signal(samples=samples, domain='time', fc=self.fc, rate = self.rate, shift = 0)
         #tRead = time.time()-t0
         #self.tlast = time.time()

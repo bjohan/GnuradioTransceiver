@@ -7,6 +7,9 @@ class AcCouple(signalProcessor.SignalProcessor):
 
 
     def process(self, signalIn):
+        print type(signalIn)
+        print dir(signalIn)
+        print signalIn 
         signalOut = dspSignal.Signal(baseSig=signalIn)
         signalOut.samples = signalIn.samples-np.mean(signalIn.samples)
         return signalOut
