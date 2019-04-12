@@ -78,7 +78,8 @@ rxdsp.start()
 try:
     while True:
         time.sleep(10)
-        dsp.status()
+        txdsp.status()
+        rxdsp.status()
 except KeyboardInterrupt:
     print "stopping dsp pipeline"
     rxdsp.stop()

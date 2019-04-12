@@ -17,8 +17,8 @@ class SoapySdrDevice(sdrDevice.SdrDeviceBase):
         self.txStream = None
         #print dir(self.sdr)
         #print help(self.sdr.setGainMode)
-        self.sdr.setGainMode(SOAPY_SDR_RX,0,True)
-        self.sdr.setGain(SOAPY_SDR_TX, 0, 60+0*100)
+        self.sdr.setGainMode(SOAPY_SDR_RX,0,False)
+        self.sdr.setGain(SOAPY_SDR_RX, 0, 40+0*100)
 
 
     def mapToDict(self, m):
