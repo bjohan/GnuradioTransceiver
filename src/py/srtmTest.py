@@ -13,12 +13,14 @@ print y
 #plt.imshow(np.clip(e, 0, 10000), extent=[x[0], x[-1], y[-1], y[0]])
 plt.figure(2)
 
-#xr = np.linspace(-180,180,500*2)
-#yr = np.linspace(-60,60,500)
+xr = np.linspace(-180,180,500*2)
+yr = np.linspace(-60,60,500)
 #xr = np.linspace(12,14,500)
 #yr = np.linspace(57,59,500)
-xr = np.linspace(110,155,10000)
-yr = np.linspace(-45,-10,5000)
+
+#australia
+#xr = np.linspace(110,155,10000)
+#yr = np.linspace(-45,-10,5000)
 
 
 rs = hr.get(xr, yr)

@@ -54,8 +54,8 @@ class Renderer(Widget):
         self.canvas['ambient_light'] = (0.1, 0.6, 0.1)
         #self.rot.angle += 1
 
-    def _keyboard_closed(self, k):
-        print k
+    #def _keyboard_closed(self, k):
+    #    print k
 
     def _on_keyboard_down(self, k, l, m, n):
         if 'shift' in l[1]:

@@ -5,7 +5,7 @@ import openglplot
 import sys
 import time
 import threading
-import queue
+import Queue
 import numpy as np
 name = 'ball_glut'
 rot1 = 0.0
@@ -83,8 +83,8 @@ class PlotWindow:
 class PlotManager(threading.Thread):
     def __init__(self):
         #glutInit(sys.argv)
-        self.cmdQ = queue.Queue()
-        self.plotQ = queue.Queue()
+        self.cmdQ = Queue.Queue()
+        self.plotQ = Queue.Queue()
         self.startLock = threading.Lock()
         self.startLock.acquire()
         self.windows = []

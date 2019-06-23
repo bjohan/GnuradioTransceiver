@@ -54,8 +54,8 @@ class Renderer(Widget):
         self.canvas['ambient_light'] = (0.1, 0.6, 0.1)
         #self.rot.angle += 1
 
-    def _keyboard_closed(self, k):
-        print k
+    #def _keyboard_closed(self, k):
+    #    print k
 
     def _on_keyboard_down(self, k, l, m, n):
         if 'shift' in l[1]:
@@ -96,13 +96,13 @@ class Renderer(Widget):
 
     def generateHeightData(self, sx, sy, za):
     
-        L = 1201
-        with open('O33/N57E012.hgt') as hgt:
-            elevations = np.fromfile(hgt, np.dtype('>i2', L*L)).reshape((L,L))
-        #elevations = srtmManager.data
+        #L = 1201
+        #with open('O33/N57E012.hgt') as hgt:
+        #    elevations = np.fromfile(hgt, np.dtype('>i2', L*L)).reshape((L,L))
+        ##elevations = srtmManager.data
         
-        return elevations[500:500+sx, 500:500+sy]/100.0
-        #return np.random.rand(sx, sy)*za
+        #return elevations[500:500+sx, 500:500+sy]/100.0
+        return np.random.rand(sx, sy)*za
 
     def calcNormals(self, hgt):
         normals = np.ones((hgt.shape[0], hgt.shape[1], 3))

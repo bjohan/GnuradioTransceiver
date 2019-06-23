@@ -430,15 +430,15 @@ s = srtmManager()
 
 em = ElevationDataManager(s)
 
-y = np.linspace(-60,-55,num)#+10+40
-x = np.linspace(8, 12, num)#+10
+###y = np.linspace(-60,-55,num)#+10+40
+###x = np.linspace(8, 12, num)#+10
 #lons = np.linspace(56,58, num)
 #lats = np.linspace(11, 12, num)
 
 #lons = np.linspace(10,13, num)
 #lats = np.linspace(56, 58, int(num/3))
 
-data = em.getData2(x, y)
+###data = em.getData2(x, y)
 ##data = np.fliplr(np.flipud(np.transpose(data)))
 #elevs = np.ones((num,num))
 #for x in range(num):
@@ -448,9 +448,9 @@ data = em.getData2(x, y)
 #        elevs[x,y]=s.getElevation(lats[x], lons[y])
 #elevs, lon, lat = s.getBlock(-12, 57)
 #elevs = np.clip(elevs, 0, 3000)
-import matplotlib.pyplot as plt
+###import matplotlib.pyplot as plt
 #plt.imshow(np.fliplr(np.flipud(elevs)))
-plt.imshow(np.clip(data.T, 0, 10000), extent=[x[-1], x[1], y[0], y[1]])
-plt.show()
+###plt.imshow(np.clip(data.T, 0, 10000), extent=[x[-1], x[1], y[0], y[1]])
+###plt.show()
 ##print "test", s.getElevation(57.5,-13.5)
 #s.buildIndex()
